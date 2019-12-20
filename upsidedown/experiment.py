@@ -107,13 +107,13 @@ def load_model(name, model, optimizer, device, train=True):
     epoch = 0
     loss = 0.0
     path = f'{name}.pt'
-    if os.path.exists(path):
-        print("Existing model found. Loading.")
+    if os.path.exists(path):        
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         epoch = checkpoint['epoch']
         loss = checkpoint['loss']
+        print(f"Existing model found. Loading from epoch {epoch} with loss: {loss}")
     else:
         print("No checkpoint found. Creating new model.")
 
