@@ -1,28 +1,149 @@
 import numpy as np
+import torch
+PATH = 'cartpole.pt'
+import os
+import torch.nn.functional as F
+import time 
 
-def rollout_random(num_episodes, env, replay_buffer, render=False):
-    avg_rewards = []
-    for _ in range(num_episodes):
-        s = env.reset()
-        done = False
-        ep_reward = 0.0
-        t = Trajectory()
-        while not done:            
-            s_old = s
+import torch.nn as nn
+def rollout_episode(env, model, sample_action=True, cmd=None, 
+                    render=False, replay_buffer=None, device=None):
+    s = env.reset()
+    done = False
+    ep_reward = 0.0
+    
+    t = Trajectory()
+    
+    while not done:
+        if model is None:
             action = env.action_space.sample()
-            if render:
-                env.render()
+        else:            
+            (dh, dr) = cmd
+                
+            inputs = torch.tensor([to_training(s, dr, dh)]).float().to(device)
 
-            s, reward, done, info = env.step(action)
-            t.add(s_old, action, reward, s)
-            ep_reward += reward
-        avg_rewards.append(ep_reward)    
+            action_probs = model(inputs)
+            action_probs = torch.sigmoid(action_probs) #, dim=-1)
+
+            if sample_action:                
+                m = torch.distributions.bernoulli.Bernoulli(probs=action_probs)            
+                action = int(m.sample().squeeze().cpu().numpy())
+            else:
+                action = int(np.round(action_probs.detach().squeeze().numpy()))
+                
+            
+        
+
+        if render:
+            env.render()
+            time.sleep(0.01)
+            
+        s_old = s        
+        s, reward, done, info = env.step(action)
+        if model is not None:
+            dh = dh - 1
+            dr = dr - reward
+            cmd = (dh, dr)
+            
+        t.add(s_old, action, reward, s)        
+        ep_reward += reward
+    
+    if replay_buffer is not None:
         replay_buffer.add(t)
+    
+    return ep_reward
 
+def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
+            replay_buffer=None, device=None):
+    """
+    @param model: Model to user to select action. If None selects random action.
+    @param cmd: If None will be sampled from the replay buffer (if present)
+    @param sample_action=True: If True samples action from distribution, otherwise 
+                                selects max.
+    """
+    rewards = [] 
+    
+    for e in range(episodes):
+        if (cmd is None) and (model is not None):
+            cmd = replay_buffer.sample_command()
+            
+        reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
+                            render=render, replay_buffer=replay_buffer, device=device)            
+        rewards.append(reward)
+    
     if render:
         env.close()
+    
+    return np.mean(rewards)
 
-    return np.mean(avg_rewards)
+def to_training(s, dr, dh):
+    l = s.tolist()
+    l.append(dr)
+    l.append(dh)
+    return l
+
+def segments_to_training(segments, device):
+    x = []
+    y = []
+    for (s, dr, dh), action in segments:
+        l = to_training(s, dr, dh)
+        x.append(l)
+        y.append(action)
+        
+    x = torch.tensor(x).float().to(device)
+    y = torch.tensor(y).float().to(device)
+    
+    return x, y
+
+class Behavior(nn.Module):
+    def __init__(self, input_shape, num_actions):
+        super(Behavior, self).__init__()
+        self.fc1 = nn.Linear(input_shape,512)
+        self.fc2 = nn.Linear(512,512)
+        self.fc3 = nn.Linear(512,512)
+        self.fc4 = nn.Linear(512,512)
+        self.fc5 = nn.Linear(512,num_actions)
+
+    def forward(self, x):
+        output = F.relu(self.fc1(x))
+        output = F.relu(self.fc2(output))
+        output = F.relu(self.fc3(output))
+        output = F.relu(self.fc4(output))
+        output = self.fc5(output)
+        return output
+    
+
+
+def save_model(epoch, model, optimizer, loss):
+    torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': loss}, 
+            PATH)
+    
+def load_model(env, device, train=True):
+    d = env.observation_space.shape[0]
+    model = Behavior(input_shape=d+2, num_actions=1).to(device)
+    optimizer = torch.optim.Adam(model.parameters())
+
+    epoch = 0
+    loss = 0.0
+    
+    if os.path.exists(PATH):
+        checkpoint = torch.load(PATH)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        epoch = checkpoint['epoch']
+        loss = checkpoint['loss']
+
+    if train:
+        model.train()
+    else:
+        model.eval()
+    
+    return epoch, model, optimizer, loss 
+
 
 class Trajectory(object):
     
@@ -72,15 +193,22 @@ class ReplayBuffer(object):
         self.buffer = sorted(self.buffer, key=lambda x: x.total_return, reverse=True)
         self.buffer = self.buffer[:self.max_size]
         
-    def sample(self, batch_size):
+    def sample(self, batch_size, device):
         trajectories = np.random.choice(self.buffer, batch_size, replace=True)
-        
-        segments = []
+        x = []
+        y = []
         
         for t in trajectories:
-            segments.append(t.sample_segment())
+            segment = t.sample_segment()
+            (s, dr, dh), action = segment
+            l = to_training(s, dr, dh)
+            x.append(l)
+            y.append(action)
             
-        return segments
+        x = torch.tensor(x).float().to(device)
+        y = torch.tensor(y).float().to(device)
+
+        return x, y
     
     def sample_command(self):
         eps = self.buffer[:self.last_few]
