@@ -7,7 +7,7 @@ import time
 
 import torch.nn as nn
 def rollout_episode(env, model, sample_action=True, cmd=None, 
-                    render=False, replay_buffer=None, device=None):
+                    render=False, device=None):
     s = env.reset()
     done = False
     ep_reward = 0.0
@@ -30,9 +30,6 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
                 action = int(m.sample().squeeze().cpu().numpy())
             else:
                 action = int(np.round(action_probs.detach().squeeze().numpy()))
-                
-            
-        
 
         if render:
             env.render()
@@ -48,33 +45,35 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
         t.add(s_old, action, reward, s)        
         ep_reward += reward
     
-    if replay_buffer is not None:
-        replay_buffer.add(t)
     
-    return ep_reward
+    return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
             replay_buffer=None, device=None):
     """
     @param model: Model to user to select action. If None selects random action.
-    @param cmd: If None will be sampled from the replay buffer (if present)
+    @param cmd: If None will be sampled from the replay buffer.
     @param sample_action=True: If True samples action from distribution, otherwise 
                                 selects max.
     """
+    trajectories = []
     rewards = [] 
     
     for e in range(episodes):
-        if (cmd is None) and (model is not None):
+        if (model is not None) and (cmd is None):
             cmd = replay_buffer.sample_command()
             
-        reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
-                            render=render, replay_buffer=replay_buffer, device=device)            
+        t, reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
+                            render=render, device=device)            
+        
+        trajectories.append(t)
+    
         rewards.append(reward)
     
     if render:
         env.close()
     
-    return np.mean(rewards)
+    return trajectories, np.mean(rewards)
 
 def to_training(s, dr, dh):
     l = s.tolist()
@@ -156,7 +155,7 @@ class Trajectory(object):
         self.trajectory.append((state, action, reward, state_prime))
         self.total_return += reward
         self.length += 1
-        
+    
     def sample_segment(self):
         T = len(self.trajectory)
 
@@ -187,12 +186,16 @@ class ReplayBuffer(object):
         
         self.last_few = last_few
         
-    def add(self, trajectory):
+    def add(self, trajectories):
+        for trajectory in trajectories:
+            self._add(trajectory)        
+            
+    def _add(self, trajectory):
         self.buffer.append(trajectory)
         
         self.buffer = sorted(self.buffer, key=lambda x: x.total_return, reverse=True)
         self.buffer = self.buffer[:self.max_size]
-        
+    
     def sample(self, batch_size, device):
         trajectories = np.random.choice(self.buffer, batch_size, replace=True)
         x = []
