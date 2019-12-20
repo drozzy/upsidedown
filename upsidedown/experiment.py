@@ -129,11 +129,16 @@ class Trajectory(object):
     
     def __init__(self):
         self.trajectory = []
+        self.cum_sum = []
         self.total_return = 0
         self.length = 0
         
     def add(self, state, action, reward, state_prime):
         self.trajectory.append((state, action, reward, state_prime))
+        if len(self.cum_sum) == 0:
+            self.cum_sum.append(reward)
+        else:
+            self.cum_sum.append(self.cum_sum[len(self.cum_sum)-1] + reward)
         self.total_return += reward
         self.length += 1
     
@@ -146,10 +151,12 @@ class Trajectory(object):
         state = self.trajectory[t1-1][0]
         action = self.trajectory[t1-1][1]
 
-        d_r = 0.0
-        for i in range(t1, t2 + 1):
-            d_r += self.trajectory[i-1][2]
-
+        #d_r = 0.0
+        #for i in range(t1, t2 + 1):
+        #    d_r += self.trajectory[i-1][2]
+                
+        d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
+        
         d_h = t2 - t1 + 1.0
 
         return ((state,d_r,d_h),action)
