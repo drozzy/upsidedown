@@ -4,7 +4,7 @@ import torch
 import os
 import torch.nn.functional as F
 import time 
-
+import random
 import torch.nn as nn
            
 
@@ -143,18 +143,14 @@ class Trajectory(object):
         self.length += 1
     
     def sample_segment(self):
-        T = len(self.trajectory)
+        T = self.length
 
-        t1 = np.random.randint(1, T+1)
-        t2 = np.random.randint(t1, T+1)
+        t1 = random.randint(1, T)
+        t2 = random.randint(t1, T)
 
         state = self.trajectory[t1-1][0]
         action = self.trajectory[t1-1][1]
 
-        #d_r = 0.0
-        #for i in range(t1, t2 + 1):
-        #    d_r += self.trajectory[i-1][2]
-                
         d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
         
         d_h = t2 - t1 + 1.0
@@ -188,18 +184,28 @@ class ReplayBuffer(object):
         trajectories = np.random.choice(self.buffer, batch_size, replace=True)
         x = []
         y = []
-        
+        import time
+        sample_t = 0.0
+        after_t = 0.0
         for t in trajectories:
+            start = time.time()
             segment = t.sample_segment()
+            sample_t += time.time() - start
+                        
+            start = time.time()
             (s, dr, dh), action = segment
             l = to_training(s, dr, dh)
+            after_t += time.time() - start
             x.append(l)
             y.append(action)
             
+            
+#         print(f'Sample time: {sample_t}')
+#         print(f'After time: {after_t}')
         x = torch.tensor(x).to(device)
         y = torch.tensor(y).to(device)
 
-        return x, y
+        return x, y, sample_t
     
     def sample_command(self):
         eps = self.buffer[:self.last_few]
