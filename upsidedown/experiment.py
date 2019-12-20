@@ -1,13 +1,15 @@
 import numpy as np
 import torch
-PATH = 'cartpole.pt'
+
 import os
 import torch.nn.functional as F
 import time 
 
 import torch.nn as nn
+           
+
 def rollout_episode(env, model, sample_action=True, cmd=None, 
-                    render=False, device=None):
+                    render=False, device=None, action_fn=None):
     s = env.reset()
     done = False
     ep_reward = 0.0
@@ -21,16 +23,8 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
             (dh, dr) = cmd
                 
             inputs = torch.tensor([to_training(s, dr, dh)]).float().to(device)
-
-            action_probs = model(inputs)
-            action_probs = torch.sigmoid(action_probs) #, dim=-1)
-
-            if sample_action:                
-                m = torch.distributions.bernoulli.Bernoulli(probs=action_probs)            
-                action = int(m.sample().squeeze().cpu().numpy())
-            else:
-                action = int(np.round(action_probs.detach().squeeze().numpy()))
-
+            action = action_fn(model, inputs, sample_action)
+            
         if render:
             env.render()
             time.sleep(0.01)
@@ -49,7 +43,7 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
     return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
-            replay_buffer=None, device=None):
+            replay_buffer=None, device=None, action_fn=None):
     """
     @param model: Model to user to select action. If None selects random action.
     @param cmd: If None will be sampled from the replay buffer.
@@ -64,7 +58,7 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
             cmd = replay_buffer.sample_command()
             
         t, reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
-                            render=render, device=device)            
+                            render=render, device=device, action_fn=action_fn)            
         
         trajectories.append(t)
     
@@ -80,19 +74,6 @@ def to_training(s, dr, dh):
     l.append(dr)
     l.append(dh)
     return l
-
-def segments_to_training(segments, device):
-    x = []
-    y = []
-    for (s, dr, dh), action in segments:
-        l = to_training(s, dr, dh)
-        x.append(l)
-        y.append(action)
-        
-    x = torch.tensor(x).float().to(device)
-    y = torch.tensor(y).float().to(device)
-    
-    return x, y
 
 class Behavior(nn.Module):
     def __init__(self, input_shape, num_actions):
@@ -113,28 +94,28 @@ class Behavior(nn.Module):
     
 
 
-def save_model(epoch, model, optimizer, loss):
+def save_model(name, epoch, model, optimizer, loss):
+    path = f'{name}.pt'
     torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss}, 
-            PATH)
+            path)
     
-def load_model(env, device, train=True):
-    d = env.observation_space.shape[0]
-    model = Behavior(input_shape=d+2, num_actions=1).to(device)
-    optimizer = torch.optim.Adam(model.parameters())
-
+def load_model(name, model, optimizer, device, train=True):
     epoch = 0
     loss = 0.0
-    
-    if os.path.exists(PATH):
-        checkpoint = torch.load(PATH)
+    path = f'{name}.pt'
+    if os.path.exists(path):
+        print("Existing model found. Loading.")
+        checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         epoch = checkpoint['epoch']
         loss = checkpoint['loss']
+    else:
+        print("No checkpoint found. Creating new model.")
 
     if train:
         model.train()
@@ -208,8 +189,8 @@ class ReplayBuffer(object):
             x.append(l)
             y.append(action)
             
-        x = torch.tensor(x).float().to(device)
-        y = torch.tensor(y).float().to(device)
+        x = torch.tensor(x).to(device)
+        y = torch.tensor(y).to(device)
 
         return x, y
     
