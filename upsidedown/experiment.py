@@ -184,28 +184,22 @@ class ReplayBuffer(object):
         trajectories = np.random.choice(self.buffer, batch_size, replace=True)
         x = []
         y = []
-        import time
-        sample_t = 0.0
-        after_t = 0.0
         for t in trajectories:
-            start = time.time()
+            
             segment = t.sample_segment()
-            sample_t += time.time() - start
+            
                         
-            start = time.time()
+            
             (s, dr, dh), action = segment
             l = to_training(s, dr, dh)
-            after_t += time.time() - start
+            
             x.append(l)
             y.append(action)
             
-            
-#         print(f'Sample time: {sample_t}')
-#         print(f'After time: {after_t}')
         x = torch.tensor(x).to(device)
         y = torch.tensor(y).to(device)
 
-        return x, y, sample_t
+        return x, y
     
     def sample_command(self):
         eps = self.buffer[:self.last_few]
