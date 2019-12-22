@@ -75,25 +75,6 @@ def to_training(s, dr, dh):
     l.append(dh)
     return l
 
-class Behavior(nn.Module):
-    def __init__(self, input_shape, num_actions):
-        super(Behavior, self).__init__()
-        self.fc1 = nn.Linear(input_shape,512)
-        self.fc2 = nn.Linear(512,512)
-        self.fc3 = nn.Linear(512,512)
-        self.fc4 = nn.Linear(512,512)
-        self.fc5 = nn.Linear(512,num_actions)
-
-    def forward(self, x):
-        output = F.relu(self.fc1(x))
-        output = F.relu(self.fc2(output))
-        output = F.relu(self.fc3(output))
-        output = F.relu(self.fc4(output))
-        output = self.fc5(output)
-        return output
-    
-
-
 def save_model(name, epoch, model, optimizer, loss):
     path = f'{name}.pt'
     torch.save({
