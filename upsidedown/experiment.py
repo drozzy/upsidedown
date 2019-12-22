@@ -52,6 +52,7 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
     """
     trajectories = []
     rewards = [] 
+    length = 0
     
     for e in range(episodes):
         if (model is not None) and (cmd is None):
@@ -61,13 +62,13 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
                             render=render, device=device, action_fn=action_fn)            
         
         trajectories.append(t)
-    
+        length += t.length
         rewards.append(reward)
     
     if render:
         env.close()
     
-    return trajectories, np.mean(rewards)
+    return trajectories, np.mean(rewards), length
 
 def to_training(s, dr, dh):
     l = s.tolist()
@@ -75,26 +76,29 @@ def to_training(s, dr, dh):
     l.append(dh)
     return l
 
-def save_model(name, epoch, model, optimizer, loss):
+def save_model(name, epoch, model, optimizer, loss, steps):
     path = f'{name}.pt'
     torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
-            'loss': loss}, 
+            'loss': loss,
+            'steps': steps}, 
             path)
     
 def load_model(name, model, optimizer, device, train=True):
     epoch = 0
     loss = 0.0
     path = f'{name}.pt'
+    steps = 0
     if os.path.exists(path):        
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         epoch = checkpoint['epoch']
         loss = checkpoint['loss']
-        print(f"Existing model found. Loading from epoch {epoch} with loss: {loss}")
+        steps = checkpoint['steps']
+        print(f"Existing model found. Loading from epoch {epoch}, steps {steps} with loss: {loss}")
     else:
         print("No checkpoint found. Creating new model.")
 
@@ -103,7 +107,7 @@ def load_model(name, model, optimizer, device, train=True):
     else:
         model.eval()
     
-    return epoch, model, optimizer, loss 
+    return epoch, model, optimizer, loss, steps
 
 
 class Trajectory(object):
