@@ -34,6 +34,7 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
             
         s_old = s        
         s, reward, done, info = env.step(action)
+        
         if model is not None:
             dh = max(dh - 1, 1)
             dr = dr - reward
@@ -73,10 +74,10 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
     
     return trajectories, np.mean(rewards), length
 
-def to_training(s, dr, dh):
+def to_training(s, dr, dh, return_scale=0.01, horizon_scale=0.01):
     l = s.tolist()
-    l.append(dr)
-    l.append(dh)
+    l.append(dr*return_scale)
+    l.append(dh*horizon_scale)
     return l
 
 def save_model(name, epoch, model, optimizer, loss, steps):
