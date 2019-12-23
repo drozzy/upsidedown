@@ -136,7 +136,7 @@ class Trajectory(object):
         T = self.length
 
         t1 = random.randint(1, T)
-        t2 = random.randint(t1, T)
+        t2 = T #random.randint(t1, T)
 
         state = self.trajectory[t1-1][0]
         action = self.trajectory[t1-1][1]
