@@ -112,11 +112,13 @@ def load_model(name, model, optimizer, device, train=True):
 
 class Trajectory(object):
     
-    def __init__(self):
+    def __init__(self, horizon_scale=0.01, return_scale=0.01):
         self.trajectory = []
         self.cum_sum = []
         self.total_return = 0
         self.length = 0
+        self.return_scale = return_scale
+        self.horizon_scale = horizon_scale
         
     def add(self, state, action, reward, state_prime):
         self.trajectory.append((state, action, reward, state_prime))
@@ -139,6 +141,9 @@ class Trajectory(object):
         d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
         
         d_h = t2 - t1 + 1.0
+        
+#         d_r *= self.return_scale
+#         d_h *= self.horizon_scale
 
         return ((state,d_r,d_h),action)
     
