@@ -13,6 +13,7 @@ import gym
 def rollout_episode(env, model, sample_action=True, cmd=None, 
                     render=False, device=None, action_fn=None):
     s = env.reset()
+    #env.seed(1000) #random.randint(10000, 100000))
     done = False
     ep_reward = 0.0
     
@@ -35,7 +36,7 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
         s, reward, done, info = env.step(action)
         if model is not None:
             dh = max(dh - 1, 1)
-            dr = min(dr - reward, 200)
+            dr = dr - reward #, 200)
             cmd = (dh, dr)
             
         t.add(s_old, action, reward, s)        
