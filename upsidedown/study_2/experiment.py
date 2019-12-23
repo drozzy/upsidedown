@@ -32,7 +32,7 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
         s_old = s        
         s, reward, done, info = env.step(action)
         if model is not None:
-            dh = dh - 1
+            dh = max(dh - 1, 1)
             dr = dr - reward
             cmd = (dh, dr)
             
