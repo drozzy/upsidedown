@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-
+from scipy.stats import median_absolute_deviation
 import os
 import torch.nn.functional as F
 import time 
@@ -201,8 +201,9 @@ class ReplayBuffer(object):
         dh_0 = np.mean([e.length for e in eps])
         
         m = np.mean([e.total_return for e in eps])
-        s = np.std([e.total_return for e in eps])
+#         s = np.std([e.total_return for e in eps])
+        s = median_absolute_deviation([e.total_return for e in eps])
         
-        dr_0 = np.random.uniform(m, m+s)
+        dr_0 = np.random.uniform(m, m + s )
         
         return dh_0, dr_0
