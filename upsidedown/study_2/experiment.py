@@ -23,7 +23,10 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
             (dh, dr) = cmd
                 
             inputs = torch.tensor([to_training(s, dr, dh)]).float().to(device)
-            action = action_fn(model, inputs, sample_action)
+            with torch.no_grad():
+                model.eval()
+                action = action_fn(model, inputs, sample_action)
+                model.train()
             
         if render:
             env.render()
