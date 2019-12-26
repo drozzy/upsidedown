@@ -17,7 +17,7 @@ dependencies:
   - nodejs=10.13.0
   - pyglet
   - pip:
-    - sacred
+    - sacred==0.8.1
     - gym==0.15.4
     - Box2D
     - matplotlib==3.1.1

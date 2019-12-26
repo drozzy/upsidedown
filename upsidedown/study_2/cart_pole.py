@@ -9,10 +9,10 @@ from torch.utils.tensorboard import SummaryWriter
 from experiment import rollout, ReplayBuffer, Trajectory, load_model, save_model
 from sacred import Experiment
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 ex = Experiment()
 
 MODEL_NAME = 'model_cart_pole_v1'
-
 
 class Behavior(torch.nn.Module):
     def __init__(self, hidden_size, input_shape, num_actions):
@@ -143,7 +143,7 @@ def action_fn(env, model, inputs, sample_action, epsilon):
     return action
 
 @ex.capture
-def run_play(epsilon):
+def run_play(epsilon, sample_action):
     env = gym.make('CartPole-v1')
     d = env.observation_space.shape[0]
     model = Behavior(input_shape=d+2, num_actions=1).to(device)
@@ -161,7 +161,7 @@ def run_play(epsilon):
         model=model, optimizer=optimizer, device=device)
     print(f"Loaded model at epoch: {e} with loss {l}")
     _, mean_reward, length = rollout(episodes=3, env=env, model=model, 
-        sample_action=True, cmd=cmd, render=True, device=device, 
+        sample_action=sample_action, cmd=cmd, render=True, device=device, 
         action_fn=action_fn, epsilon=epsilon)
 
     print(f"Average Episode Reward: {mean_reward}, Mean Length: {length}")
@@ -169,7 +169,8 @@ def run_play(epsilon):
 @ex.config
 def play_config():
     epsilon = 0.0
-    
+    sample_action = True
+
 @ex.config
 def run_config():
     train = True
