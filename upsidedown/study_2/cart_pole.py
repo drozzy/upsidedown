@@ -88,7 +88,6 @@ def run_train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, ma
             device=device, action_fn=action_fn, epsilon=start_epsilon, max_return=max_return)
         rb.add(roll.trajectories)
         
-        print(f"Average Episode Reward: {roll.mean_reward}")          
         steps += roll.length
         
         writer.add_scalar('Rollout/reward', roll.mean_reward, steps)
@@ -100,6 +99,7 @@ def run_train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, ma
                 device=device, action_fn=action_fn, evaluation=True, 
                 max_return=max_return)
 
+        print(f"Eval Episode Mean Reward: {roll.mean_reward}")        
         writer.add_scalar('Eval/reward', roll.mean_reward, steps)        
         writer.add_scalar('Eval/length', roll.mean_length, steps)
 
@@ -174,10 +174,10 @@ def run_play(epsilon, sample_action, hidden_size, play_episodes, max_return, dh,
             action_fn=action_fn, epsilon=epsilon, max_return=max_return)
 
         print(f"Episode Reward: {roll.mean_reward}, Length: {roll.length}")
-
     
 @ex.config
 def run_config():
+    train = True # Train or play?
     hidden_size = 32
     max_return = 300 # Max return per episode 
 
@@ -203,6 +203,7 @@ def run_config():
 
 
 @ex.automain
+@ex.capture
 def main(train):
     if train:
         run_train()
