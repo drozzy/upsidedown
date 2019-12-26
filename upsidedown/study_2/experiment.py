@@ -79,8 +79,8 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
 
 def to_training(s, dr, dh, return_scale=0.01, horizon_scale=0.01):
     l = s.tolist()
-    l.append(dr*return_scale)
     l.append(dh*horizon_scale)
+    l.append(dr*return_scale)
     return l
 
 def save_model(name, epoch, model, optimizer, loss, steps):
@@ -119,7 +119,7 @@ def load_model(name, model, optimizer, device, train=True):
 
 class Trajectory(object):
     
-    def __init__(self, horizon_scale=0.001, return_scale=0.001):
+    def __init__(self, horizon_scale=0.0001, return_scale=0.0001):
         self.trajectory = []
         self.cum_sum = []
         self.total_return = 0
@@ -139,7 +139,7 @@ class Trajectory(object):
     def sample_segment(self):
         T = self.length
 
-        t1 = random.randint(2, T)
+        t1 = random.randint(1, T)
         t2 = T #random.randint(t1, T)
         
         state = self.trajectory[t1-1][0]
@@ -148,9 +148,6 @@ class Trajectory(object):
         d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
         
         d_h = t2 - t1 + 1.0
-        
-#         d_r *= self.return_scale
-#         d_h *= self.horizon_scale
 
         return ((state,d_r,d_h),action)
     
