@@ -27,7 +27,7 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
                 model.eval()
                 action = action_fn(model, inputs, sample_action)
                 model.train()
-            
+        
         if render:
             env.render()
             time.sleep(0.01)
@@ -37,7 +37,7 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
         
         if model is not None:
             dh = max(dh - 1, 1)
-            dr = dr - reward
+            dr = min(dr - reward, 300)
             cmd = (dh, dr)
             
         t.add(s_old, action, reward, s)        
@@ -47,7 +47,7 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
     return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
-            replay_buffer=None, device=None, action_fn=None):
+            replay_buffer=None, device=None, action_fn=None, evaluation=False):
     """
     @param model: Model to user to select action. If None selects random action.
     @param cmd: If None will be sampled from the replay buffer.
@@ -60,7 +60,10 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
     
     for e in range(episodes):
         if (model is not None) and (cmd is None):
-            cmd = replay_buffer.sample_command()
+            if evaluation:
+                cmd = replay_buffer.eval_command()
+            else:
+                cmd = replay_buffer.sample_command()
             
         t, reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
                             render=render, device=device, action_fn=action_fn)            
@@ -116,7 +119,7 @@ def load_model(name, model, optimizer, device, train=True):
 
 class Trajectory(object):
     
-    def __init__(self, horizon_scale=0.01, return_scale=0.01):
+    def __init__(self, horizon_scale=0.001, return_scale=0.001):
         self.trajectory = []
         self.cum_sum = []
         self.total_return = 0
@@ -136,9 +139,9 @@ class Trajectory(object):
     def sample_segment(self):
         T = self.length
 
-        t1 = random.randint(1, T)
+        t1 = random.randint(2, T)
         t2 = T #random.randint(t1, T)
-
+        
         state = self.trajectory[t1-1][0]
         action = self.trajectory[t1-1][1]
 
@@ -201,9 +204,18 @@ class ReplayBuffer(object):
         dh_0 = np.mean([e.length for e in eps])
         
         m = np.mean([e.total_return for e in eps])
-#         s = np.std([e.total_return for e in eps])
-        s = median_absolute_deviation([e.total_return for e in eps])
+        s = np.std([e.total_return for e in eps])
+#         s = median_absolute_deviation([e.total_return for e in eps])
         
-        dr_0 = np.random.uniform(m, m + s )
+        dr_0 = np.random.uniform(m, m + s)
+        
+        return dh_0, dr_0
+
+    def eval_command(self):
+        eps = self.buffer[:self.last_few]
+        
+        dh_0 = np.mean([e.length for e in eps])
+        
+        dr_0 = np.min([e.total_return for e in eps])
         
         return dh_0, dr_0
