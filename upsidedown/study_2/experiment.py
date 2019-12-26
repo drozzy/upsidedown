@@ -9,7 +9,7 @@ import torch.nn as nn
            
 
 def rollout_episode(env, model, sample_action, cmd, 
-                    render, device, action_fn, epsilon):
+                    render, device, action_fn, epsilon, max_return=300):
     s = env.reset()
     done = False
     ep_reward = 0.0
@@ -37,7 +37,7 @@ def rollout_episode(env, model, sample_action, cmd,
         
         if model is not None:
             dh = max(dh - 1, 1)
-            dr = min(dr - reward, 300)
+            dr = min(dr - reward, max_return)
             cmd = (dh, dr)
             
         t.add(s_old, action, reward, s)        
@@ -47,7 +47,7 @@ def rollout_episode(env, model, sample_action, cmd,
     return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
-            replay_buffer=None, device=None, action_fn=None, evaluation=False, epsilon=-1.0):
+            replay_buffer=None, device=None, action_fn=None, evaluation=False, epsilon=-1.0, max_return=300):
     """
     @param model: Model to user to select action. If None selects random action.
     @param cmd: If None will be sampled from the replay buffer.
@@ -76,7 +76,23 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
     if render:
         env.close()
     
-    return trajectories, np.mean(rewards), length
+    return Rollout(episodes=episodes, trajectories=trajectories, rewards=rewards, length=length)
+
+class Rollout(object):
+    def __init__(self, episodes, trajectories, rewards, length):
+        self.rewards = rewards
+        self.length = length
+        self.trajectories = trajectories
+        self.episodes = episodes
+
+    @property
+    def mean_length(self):
+        return self.length * 1.0 / self.episodes
+
+    @property
+    def mean_reward(self):
+        return np.mean(self.rewards)
+
 
 def to_training(s, dr, dh, return_scale=0.01, horizon_scale=0.01):
     l = s.tolist()
@@ -84,27 +100,28 @@ def to_training(s, dr, dh, return_scale=0.01, horizon_scale=0.01):
     l.append(dr*return_scale)
     return l
 
-def save_model(name, epoch, model, optimizer, loss, steps):
+def save_checkpoint(name, model, optimizer, loss, updates, steps):
     path = f'{name}.pt'
     torch.save({
-            'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
+            'updates': updates,
             'steps': steps}, 
             path)
     
-def load_model(name, model, optimizer, device, train=True):
+def load_checkpoint(name, model, optimizer, device, train=True):
     epoch = 0
     loss = 0.0
     path = f'{name}.pt'
     steps = 0
+    updates = 0
     if os.path.exists(path):        
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        epoch = checkpoint['epoch']
         loss = checkpoint['loss']
+        updates = checkpoint['updates']
         steps = checkpoint['steps']
         print(f"Existing model found. Loading from epoch {epoch}, steps {steps} with loss: {loss}")
     else:
@@ -115,7 +132,15 @@ def load_model(name, model, optimizer, device, train=True):
     else:
         model.eval()
     
-    return epoch, model, optimizer, loss, steps
+    return Checkpoint(model, optimizer, loss, updates, steps)
+
+class Checkpoint(object):
+    def __init__(self, model, optimizer, loss, updates, steps):
+        self.model = model
+        self.optimizer = optimizer
+        self.loss = loss
+        self.updates = updates
+        self.steps = steps
 
 
 class Trajectory(object):
