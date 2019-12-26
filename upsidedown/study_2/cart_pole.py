@@ -180,6 +180,8 @@ def run_config():
     train = True # Train or play?
     hidden_size = 32
     max_return = 300 # Max return per episode 
+    experiment_name = 'cart_pole_v1'
+    checkpoint_name = f'checkpoint_{experiment_name}.pt'
 
     # Train specific
     batch_size = 1024
