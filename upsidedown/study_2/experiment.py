@@ -8,8 +8,8 @@ import random
 import torch.nn as nn
            
 
-def rollout_episode(env, model, sample_action=True, cmd=None, 
-                    render=False, device=None, action_fn=None):
+def rollout_episode(env, model, sample_action, cmd, 
+                    render, device, action_fn, epsilon):
     s = env.reset()
     done = False
     ep_reward = 0.0
@@ -25,7 +25,7 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
             inputs = torch.tensor([to_training(s, dr, dh)]).float().to(device)
             with torch.no_grad():
                 model.eval()
-                action = action_fn(model, inputs, sample_action)
+                action = action_fn(env, model, inputs, sample_action, epsilon=epsilon)
                 model.train()
         
         if render:
@@ -47,12 +47,13 @@ def rollout_episode(env, model, sample_action=True, cmd=None,
     return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
-            replay_buffer=None, device=None, action_fn=None, evaluation=False):
+            replay_buffer=None, device=None, action_fn=None, evaluation=False, epsilon=-1.0):
     """
     @param model: Model to user to select action. If None selects random action.
     @param cmd: If None will be sampled from the replay buffer.
     @param sample_action=True: If True samples action from distribution, otherwise 
                                 selects max.
+    @param epsilon - Probability of doing a random action. Between 0 and 1.0. Or -1 if no random actions are needed?
     """
     trajectories = []
     rewards = [] 
@@ -66,7 +67,7 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
                 cmd = replay_buffer.sample_command()
             
         t, reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
-                            render=render, device=device, action_fn=action_fn)            
+                            render=render, device=device, action_fn=action_fn, epsilon=epsilon)            
         
         trajectories.append(t)
         length += t.length
