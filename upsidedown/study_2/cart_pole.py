@@ -125,7 +125,12 @@ def train(checkpoint_path, batch_size, hidden_size, solved_mean_reward, solved_n
         if steps >= max_steps:
             print(f"Steps {steps} exceeds max env steps {max_steps}. Stopping.")
             break        
-            
+        
+    add_artifact()
+
+@ex.capture
+def add_artifact(checkpoint_path):
+    ex.add_artifact(checkpoint_path, name='last_checkpoint.pt')
 
 def train_step(inputs, targets, model, optimizer, loss_object):
     optimizer.zero_grad()    
