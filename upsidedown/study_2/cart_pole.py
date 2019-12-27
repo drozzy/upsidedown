@@ -203,7 +203,7 @@ def run_config():
     eval_episodes = 10
 
     experiment_name = f'cartpole_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{start_epsilon}_ev{eval_episodes}'
-    checkpoint_path = f'checkpoint.pt'
+    checkpoint_path = f'checkpoint_{experiment_name}.pt'
 
     # Play specific
     epsilon = 0.0
