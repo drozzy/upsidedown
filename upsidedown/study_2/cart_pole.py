@@ -130,7 +130,7 @@ def train(checkpoint_path, batch_size, hidden_size, solved_mean_reward, solved_n
 
 @ex.capture
 def add_artifact(checkpoint_path):
-    ex.add_artifact(checkpoint_path, name='last_checkpoint.pt')
+    ex.add_artifact(checkpoint_path, name='checkpoint.pt')
 
 def train_step(inputs, targets, model, optimizer, loss_object):
     optimizer.zero_grad()    

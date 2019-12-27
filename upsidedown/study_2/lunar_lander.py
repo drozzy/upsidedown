@@ -53,6 +53,8 @@ def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, 
     print(f"Mean Episode Reward: {roll.mean_reward}")
 
     # Keep track of steps used during random rollout!
+    print("Trying to load:")
+    print(checkpoint_path)
     c = load_checkpoint(checkpoint_path, model, optimizer, device, train=True)
     updates, steps, loss = c.updates, c.steps, c.loss
 
@@ -130,7 +132,7 @@ def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, 
 
 @ex.capture
 def add_artifact(checkpoint_path):
-    ex.add_artifact(checkpoint_path, name='last_checkpoint.pt')
+    ex.add_artifact(checkpoint_path, name='checkpoint.pt')
            
 def train_step(inputs, targets, model, optimizer, loss_object):
     optimizer.zero_grad()    
