@@ -33,7 +33,7 @@ class Behavior(nn.Module):
 
 @ex.command
 def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, solved_mean_reward, solved_n_episodes, replay_size, last_few, 
-    n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, start_epsilon, eval_episodes, max_return, lr):
+    n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, epsilon, eval_episodes, max_return, lr):
     """
     Begin or resume training a policy.
     """
@@ -89,7 +89,7 @@ def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, 
         # Exploration    
         roll = rollout(n_episodes_per_iter, env=env, model=model, 
             sample_action=True, replay_buffer=rb, device=device, action_fn=action_fn, 
-            epsilon=start_epsilon, max_return=max_return)
+            epsilon=epsilon, max_return=max_return)
         rb.add(roll.trajectories)
 
         steps += roll.length
@@ -184,6 +184,7 @@ def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh
 def run_config():    
     train = True # Train or play?
     hidden_size = 32
+    epsilon = 0.0
 
     # Train specific
     lr = 0.005
@@ -196,15 +197,13 @@ def run_config():
     n_warmup_episodes = 30
     n_episodes_per_iter = 10
     n_updates_per_iter = 50
-    start_epsilon = 0.1 # Probability of taking a random action during training
     eval_episodes = 10
     max_return = 300
 
-    experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{start_epsilon}_ev{eval_episodes}'
+    experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_ev{eval_episodes}'
     checkpoint_path = f'checkpoint_{experiment_name}.pt'
 
     # Play specific
-    epsilon = 0.0
     sample_action = True
     play_episodes = 5
     dh = 200

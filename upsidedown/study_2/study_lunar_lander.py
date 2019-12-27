@@ -12,7 +12,7 @@ def study():
     for epsilon in epsilons:
         for max_return in max_returns:
             ex.run(config_updates={
-                'start_epsilon': epsilon,
+                'epsilon': epsilon,
                 'max_return' : max_return
             })
 
