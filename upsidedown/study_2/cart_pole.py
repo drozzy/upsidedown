@@ -121,7 +121,7 @@ def train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_st
         eval_mean_reward = np.mean(rewards)
 
         if eval_mean_reward >= solved_mean_reward:
-            print("Task considered solved. Achieved {eval_mean_reward} >= {solved_mean_reward} over {solved_n_episodes} episodes.")
+            print(f"Task considered solved. Achieved {eval_mean_reward} >= {solved_mean_reward} over {solved_n_episodes} episodes.")
             break
         
         if steps >= max_steps:
