@@ -39,7 +39,7 @@ def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_
     """
     Begin or resume training a policy.
     """
-    log_dir = f'runs/{_run._id}_{experiment_name}'
+    log_dir = f'tensorboard/{_run._id}_{experiment_name}'
     writer = SummaryWriter(log_dir=log_dir)
     env = gym.make('LunarLander-v2')
     
