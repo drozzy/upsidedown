@@ -59,7 +59,8 @@ def run_train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, ma
     save_checkpoint(MODEL_NAME, model=model, optimizer=optimizer, loss=loss, updates=updates, steps=steps)
 
     # Plot initial values
-    writer.add_scalar('Rollout/reward', roll.mean_reward, steps)       
+    writer.add_scalar('Train/reward', roll.mean_reward, steps)   
+    writer.add_scalar('Train/length', roll.mean_length, steps)
 
     loss_sum = 0
     loss_count = 0    
@@ -89,9 +90,13 @@ def run_train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, ma
         rb.add(roll.trajectories)
         
         steps += roll.length
+
+        (dh, dr) = rb.sample_command()
+        writer.add_scalar('Train/dr', dr, steps)
+        writer.add_scalar('Train/dh', dh, steps)
         
-        writer.add_scalar('Rollout/reward', roll.mean_reward, steps)
-        writer.add_scalar('Rollout/length', roll.mean_length, steps)
+        writer.add_scalar('Train/reward', roll.mean_reward, steps)
+        writer.add_scalar('Train/length', roll.mean_length, steps)
 
         # Eval
         roll = rollout(eval_episodes, env=env, model=model, 
@@ -99,13 +104,13 @@ def run_train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, ma
                 device=device, action_fn=action_fn, evaluation=True, 
                 max_return=max_return)
 
+        (dh, dr) = rb.eval_command()
+        writer.add_scalar('Eval/dr', dr, steps)
+        writer.add_scalar('Eval/dh', dh, steps)
+
         print(f"Eval Episode Mean Reward: {roll.mean_reward}")        
         writer.add_scalar('Eval/reward', roll.mean_reward, steps)        
         writer.add_scalar('Eval/length', roll.mean_length, steps)
-
-        (dh, dr) = rb.sample_command()
-        writer.add_scalar('Eval/dr', dr, steps)
-        writer.add_scalar('Eval/dh', dh, steps)
 
         # Stopping criteria
         rewards.extend(roll.rewards)
