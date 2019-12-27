@@ -10,6 +10,8 @@ from experiment import rollout, ReplayBuffer, Trajectory, load_checkpoint, save_
 from sacred import Experiment
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+from sacred.stflow import LogFileWriter
+
 ex = Experiment()
 
 class Behavior(nn.Module):
@@ -32,12 +34,13 @@ class Behavior(nn.Module):
         return output
 
 @ex.command
-def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, solved_mean_reward, solved_n_episodes, replay_size, last_few, 
+def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, solved_mean_reward, solved_n_episodes, replay_size, last_few, 
     n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, epsilon, eval_episodes, max_return, lr):
     """
     Begin or resume training a policy.
     """
-    writer = SummaryWriter(comment=experiment_name)
+    log_dir = f'runs/{_run._id}_{experiment_name}'
+    writer = SummaryWriter(log_dir=log_dir)
     env = gym.make('LunarLander-v2')
     
     loss_object = torch.nn.CrossEntropyLoss().to(device)
@@ -202,6 +205,7 @@ def run_config():
 
     experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_ev{eval_episodes}'
     checkpoint_path = f'checkpoint_{experiment_name}.pt'
+
 
     # Play specific
     sample_action = True

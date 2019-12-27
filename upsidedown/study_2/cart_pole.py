@@ -27,14 +27,15 @@ class Behavior(torch.nn.Module):
         return self.classifier(x)
 
 @ex.command
-def train(checkpoint_path, batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_steps, 
+def train(_run, experiment_name, checkpoint_path, batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_steps, 
     replay_size, last_few, n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter,
     epsilon, eval_episodes, max_return):
     """
     Begin or resume training a policy.
     """
+    log_dir = f'runs/{_run._id}_{experiment_name}'
+    writer = SummaryWriter(log_dir=log_dir)
 
-    writer = SummaryWriter()
     env = gym.make('CartPole-v1')
 
     loss_object = torch.nn.BCEWithLogitsLoss().to(device)
