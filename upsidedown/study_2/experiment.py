@@ -100,8 +100,8 @@ def to_training(s, dr, dh, return_scale=0.01, horizon_scale=0.01):
     l.append(dr*return_scale)
     return l
 
-def save_checkpoint(name, model, optimizer, loss, updates, steps):
-    path = f'{name}.pt'
+def save_checkpoint(path, model, optimizer, loss, updates, steps):
+    
     torch.save({
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
@@ -110,10 +110,9 @@ def save_checkpoint(name, model, optimizer, loss, updates, steps):
             'steps': steps}, 
             path)
     
-def load_checkpoint(name, model, optimizer, device, train=True):
+def load_checkpoint(path, model, optimizer, device, train=True):
     epoch = 0
-    loss = 0.0
-    path = f'{name}.pt'
+    loss = 0.0    
     steps = 0
     updates = 0
     if os.path.exists(path):        

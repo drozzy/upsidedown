@@ -12,8 +12,6 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 ex = Experiment()
 
-MODEL_NAME = 'model_cart_pole_v1'
-
 class Behavior(torch.nn.Module):
     def __init__(self, hidden_size, input_shape, num_actions):
         super(Behavior, self).__init__()
@@ -29,7 +27,7 @@ class Behavior(torch.nn.Module):
         return self.classifier(x)
 
 @ex.command
-def train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_steps, 
+def train(checkpoint_path, batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_steps, 
     replay_size, last_few, n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter,
     start_epsilon, eval_episodes, max_return):
     """
@@ -54,12 +52,12 @@ def train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_st
     print(f"Mean Episode Reward: {roll.mean_reward}")
 
     # Keep track of steps used during random rollout!
-    c = load_checkpoint(MODEL_NAME, model, optimizer, device, train=True)
+    c = load_checkpoint(checkpoint_path, model, optimizer, device, train=True)
     updates, steps, loss  = c.updates, c.steps, c.loss
 
     steps += roll.length
 
-    save_checkpoint(MODEL_NAME, model=model, optimizer=optimizer, loss=loss, updates=updates, steps=steps)
+    save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=loss, updates=updates, steps=steps)
 
     # Plot initial values
     writer.add_scalar('Train/reward', roll.mean_reward, steps)   
@@ -84,7 +82,7 @@ def train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_st
         avg_loss = loss_sum/loss_count
         print(f'u: {updates}, s: {steps}, Loss: {avg_loss}')
 
-        save_checkpoint(MODEL_NAME, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
+        save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
 
         # Exploration
         roll = rollout(n_episodes_per_iter, env=env, 
@@ -155,7 +153,7 @@ def action_fn(env, model, inputs, sample_action, epsilon):
     return action
 
 @ex.command
-def play(epsilon, sample_action, hidden_size, play_episodes, max_return, dh, dr):
+def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, max_return, dh, dr):
     """
     Play episodes using a trained policy. 
     """
@@ -170,7 +168,7 @@ def play(epsilon, sample_action, hidden_size, play_episodes, max_return, dh, dr)
     cmd = (dh, dr)
     # cmd = rb.sample_command()
    
-    checkpoint = load_checkpoint(MODEL_NAME, train=False, 
+    checkpoint = load_checkpoint(checkpoint_path, train=False, 
         model=model, optimizer=optimizer, device=device)
     updates = checkpoint.updates
     steps   = checkpoint.steps
@@ -190,9 +188,7 @@ def play(epsilon, sample_action, hidden_size, play_episodes, max_return, dh, dr)
 def run_config():
     hidden_size = 32
     max_return = 300 # Max return per episode 
-    experiment_name = 'cart_pole_v1'
-    checkpoint_name = f'checkpoint_{experiment_name}.pt'
-
+    
     # Train specific
     batch_size = 1024
     solved_mean_reward = 195 # Considered solved when the average reward is greater than or equal to
@@ -205,6 +201,9 @@ def run_config():
     n_updates_per_iter = 100
     start_epsilon = 0.1
     eval_episodes = 10
+
+    experiment_name = f'cartpole_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{start_epsilon}_ev{eval_episodes}'
+    checkpoint_path = f'checkpoint.pt'
 
     # Play specific
     epsilon = 0.0

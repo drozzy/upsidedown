@@ -13,8 +13,7 @@ def study():
         for max_return in max_returns:
             ex.run(config_updates={
                 'start_epsilon': epsilon,
-                'max_return' : max_return,
-                'experiment_name' : f'lunar_lander_eps_{epsilon}_mr_{max_return}'
+                'max_return' : max_return
             })
 
 if __name__ == '__main__':

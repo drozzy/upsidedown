@@ -32,7 +32,7 @@ class Behavior(nn.Module):
         return output
 
 @ex.command
-def train(experiment_name, checkpoint_name, batch_size, max_steps, hidden_size, solved_mean_reward, solved_n_episodes, replay_size, last_few, 
+def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, solved_mean_reward, solved_n_episodes, replay_size, last_few, 
     n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, start_epsilon, eval_episodes, max_return, lr):
     """
     Begin or resume training a policy.
@@ -53,12 +53,12 @@ def train(experiment_name, checkpoint_name, batch_size, max_steps, hidden_size, 
     print(f"Mean Episode Reward: {roll.mean_reward}")
 
     # Keep track of steps used during random rollout!
-    c = load_checkpoint(checkpoint_name, model, optimizer, device, train=True)
+    c = load_checkpoint(checkpoint_path, model, optimizer, device, train=True)
     updates, steps, loss = c.updates, c.steps, c.loss
 
     steps += roll.length
     
-    save_checkpoint(checkpoint_name, model=model, optimizer=optimizer, loss=loss, updates=updates, steps=steps)
+    save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=loss, updates=updates, steps=steps)
 
     # Plot initial values
     writer.add_scalar('Train/reward', roll.mean_reward, steps)   
@@ -82,7 +82,7 @@ def train(experiment_name, checkpoint_name, batch_size, max_steps, hidden_size, 
         avg_loss = loss_sum/loss_count
         print(f'u: {updates}, s: {steps}, Loss: {avg_loss}')
 
-        save_checkpoint(checkpoint_name, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
+        save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
 
         # Exploration    
         roll = rollout(n_episodes_per_iter, env=env, model=model, 
@@ -152,7 +152,7 @@ def action_fn(env, model, inputs, sample_action, epsilon):
     return action
 
 @ex.command
-def play(checkpoint_name, epsilon, sample_action, hidden_size, play_episodes, dh, dr):
+def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh, dr):
     """
     Play episodes using a trained policy. 
     """
@@ -163,7 +163,7 @@ def play(checkpoint_name, epsilon, sample_action, hidden_size, play_episodes, dh
     model = Behavior(hidden_size=hidden_size,state_shape=env.observation_space.shape[0], cmd_shape=2, num_actions=env.action_space.n).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
-    c = load_checkpoint(name=checkpoint_name, train=False, 
+    c = load_checkpoint(name=checkpoint_path, train=False, 
         model=model, optimizer=optimizer, device=device)
 
     for _ in range(play_episodes):
@@ -175,8 +175,6 @@ def play(checkpoint_name, epsilon, sample_action, hidden_size, play_episodes, dh
 
 @ex.config
 def run_config():    
-    experiment_name = 'lunar_lander_v2'
-    checkpoint_name = f'checkpoint_{experiment_name}.pt'
     train = True # Train or play?
     hidden_size = 32
 
@@ -194,6 +192,9 @@ def run_config():
     start_epsilon = 0.1 # Probability of taking a random action during training
     eval_episodes = 10
     max_return = 300
+
+    experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{start_epsilon}_ev{eval_episodes}'
+    checkpoint_path = f'checkpoint.pt'
 
     # Play specific
     epsilon = 0.0
