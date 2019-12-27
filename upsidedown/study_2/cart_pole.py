@@ -28,10 +28,13 @@ class Behavior(torch.nn.Module):
     def forward(self, x):
         return self.classifier(x)
 
-@ex.capture
-def run_train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_steps, 
+@ex.command
+def train(batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_steps, 
     replay_size, last_few, n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter,
     start_epsilon, eval_episodes, max_return):
+    """
+    Begin or resume training a policy.
+    """
 
     writer = SummaryWriter()
     env = gym.make('CartPole-v1')
@@ -151,8 +154,11 @@ def action_fn(env, model, inputs, sample_action, epsilon):
         action = int(np.round(action_probs.detach().squeeze().numpy()))
     return action
 
-@ex.capture
-def run_play(epsilon, sample_action, hidden_size, play_episodes, max_return, dh, dr):
+@ex.command
+def play(epsilon, sample_action, hidden_size, play_episodes, max_return, dh, dr):
+    """
+    Play episodes using a trained policy. 
+    """
     env = gym.make('CartPole-v1')
     d = env.observation_space.shape[0]
     model = Behavior(hidden_size=hidden_size, input_shape=d+2, num_actions=1).to(device)
@@ -182,7 +188,6 @@ def run_play(epsilon, sample_action, hidden_size, play_episodes, max_return, dh,
     
 @ex.config
 def run_config():
-    train = True # Train or play?
     hidden_size = 32
     max_return = 300 # Max return per episode 
     experiment_name = 'cart_pole_v1'
@@ -210,9 +215,8 @@ def run_config():
 
 
 @ex.automain
-@ex.capture
-def main(train):
-    if train:
-        run_train()
-    else:
-        run_play()
+def main():
+    """
+    Default runs train() command.
+    """
+    train()

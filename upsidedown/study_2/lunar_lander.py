@@ -31,10 +31,12 @@ class Behavior(nn.Module):
         output = self.fc2(output)
         return output
 
-@ex.capture
-def run_train(experiment_name, checkpoint_name, batch_size, max_steps, hidden_size, solved_mean_reward, solved_n_episodes, replay_size, last_few, 
+@ex.command
+def train(experiment_name, checkpoint_name, batch_size, max_steps, hidden_size, solved_mean_reward, solved_n_episodes, replay_size, last_few, 
     n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, start_epsilon, eval_episodes, max_return, lr):
-    
+    """
+    Begin or resume training a policy.
+    """
     writer = SummaryWriter(comment=experiment_name)
     env = gym.make('LunarLander-v2')
     
@@ -149,8 +151,11 @@ def action_fn(env, model, inputs, sample_action, epsilon):
         action = int(np.argmax(action_probs.detach().squeeze().numpy()))
     return action
 
-@ex.capture
-def run_play(checkpoint_name, epsilon, sample_action, hidden_size, play_episodes, dh, dr):
+@ex.command
+def play(checkpoint_name, epsilon, sample_action, hidden_size, play_episodes, dh, dr):
+    """
+    Play episodes using a trained policy. 
+    """
     env = gym.make('LunarLander-v2')
     cmd = (dh, dr)
 
@@ -200,9 +205,8 @@ def run_config():
 
 
 @ex.automain
-@ex.capture
-def main(train):
-    if train:
-        run_train()
-    else:
-        run_play()
+def main():
+    """
+    Default runs train() command
+    """
+    train()
