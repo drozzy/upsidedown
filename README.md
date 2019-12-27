@@ -10,3 +10,9 @@ Create new environment:
 Update existing project environment:
 
     conda env update -f environment.yml  --prune
+
+Clone the openai gym repo and run:
+
+    git clone git@github.com:openai/gym.git
+    cd gym
+    pip install -e '.[atari]'
