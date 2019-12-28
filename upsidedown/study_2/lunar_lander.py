@@ -137,7 +137,7 @@ def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_
         if steps_exceeded:
             print(f"Steps {steps} exceeds max env steps {max_steps}. Stopping.")
             break  
-            
+
     add_artifact()
 
 @ex.capture
@@ -207,7 +207,7 @@ def run_config():
     n_warmup_episodes = 30
     n_episodes_per_iter = 10
     n_updates_per_iter = 50
-    eval_episodes = 10
+    eval_episodes = 100
     eval_every_n_steps = 50_000
     max_return = 300
 
