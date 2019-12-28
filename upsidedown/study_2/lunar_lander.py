@@ -72,6 +72,7 @@ def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_
     loss_sum = 0
     loss_count = 0
     rewards = []
+    last_eval_step = 0
 
     while True:
         for _ in range(n_updates_per_iter):
@@ -105,32 +106,38 @@ def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_
         writer.add_scalar('Train/length', roll.mean_length, steps)
         
         # Eval
-        roll = rollout(eval_episodes, env=env, model=model, 
-                sample_action=True, replay_buffer=rb, 
-                device=device, action_fn=action_fn, evaluation=True,
-                max_return=max_return)
+        steps_exceeded = steps >= max_steps
 
-        (dh, dr) = rb.eval_command()
-        writer.add_scalar('Eval/dr', dr, steps)
-        writer.add_scalar('Eval/dh', dh, steps)
-        
-        writer.add_scalar('Eval/reward', roll.mean_reward, steps) 
-        writer.add_scalar('Eval/length', roll.mean_length, steps)
-        
-        print(f"Eval Episode Mean Reward: {roll.mean_reward}")      
+        if (steps - last_eval_step) >= eval_every_n_steps or steps_exceeded:
+            last_eval_step = steps
 
-        # Stopping criteria
-        rewards.extend(roll.rewards)
-        rewards = rewards[-solved_n_episodes:]
-        eval_min_reward = np.min(rewards)
+            roll = rollout(eval_episodes, env=env, model=model, 
+                    sample_action=True, replay_buffer=rb, 
+                    device=device, action_fn=action_fn, evaluation=True,
+                    max_return=max_return)
 
-        if eval_min_reward >= solved_min_reward:
-            print(f"Task considered solved. Achieved {eval_min_reward} >= {solved_min_reward} over {solved_n_episodes} episodes.")
-            break
+            (dh, dr) = rb.eval_command()
+            writer.add_scalar('Eval/dr', dr, steps)
+            writer.add_scalar('Eval/dh', dh, steps)
+            
+            writer.add_scalar('Eval/reward', roll.mean_reward, steps) 
+            writer.add_scalar('Eval/length', roll.mean_length, steps)
+            
+            print(f"Eval Episode Mean Reward: {roll.mean_reward}")      
+
+            # Stopping criteria
+            rewards.extend(roll.rewards)
+            rewards = rewards[-solved_n_episodes:]
+            eval_min_reward = np.min(rewards)
+
+            if eval_min_reward >= solved_min_reward:
+                print(f"Task considered solved. Achieved {eval_min_reward} >= {solved_min_reward} over {solved_n_episodes} episodes.")
+                break
         
-        if steps >= max_steps:
+        if steps_exceeded:
             print(f"Steps {steps} exceeds max env steps {max_steps}. Stopping.")
             break  
+            
     add_artifact()
 
 @ex.capture
@@ -201,6 +208,7 @@ def run_config():
     n_episodes_per_iter = 10
     n_updates_per_iter = 50
     eval_episodes = 10
+    eval_every_n_steps = 50_000
     max_return = 300
 
     experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_ev{eval_episodes}'
