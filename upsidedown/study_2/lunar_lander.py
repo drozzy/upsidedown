@@ -32,7 +32,7 @@ class Behavior(nn.Module):
         return output
 
 @ex.command
-def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, solved_mean_reward, solved_n_episodes, replay_size, last_few, 
+def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, solved_min_reward, solved_n_episodes, replay_size, last_few, 
     n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, start_epsilon, eval_episodes, max_return, lr):
     """
     Begin or resume training a policy.
@@ -119,10 +119,10 @@ def train(experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, 
         # Stopping criteria
         rewards.extend(roll.rewards)
         rewards = rewards[-solved_n_episodes:]
-        eval_mean_reward = np.mean(rewards)
+        eval_min_reward = np.min(rewards)
 
-        if eval_mean_reward >= solved_mean_reward:
-            print(f"Task considered solved. Achieved {eval_mean_reward} >= {solved_mean_reward} over {solved_n_episodes} episodes.")
+        if eval_min_reward >= solved_min_reward:
+            print(f"Task considered solved. Achieved {eval_min_reward} >= {solved_min_reward} over {solved_n_episodes} episodes.")
             break
         
         if steps >= max_steps:
@@ -188,8 +188,8 @@ def run_config():
     # Train specific
     lr = 0.005
     batch_size = 1024
-    solved_mean_reward = 200 # Solved is 200 points
-    solved_n_episodes =  100 # (Andriy: let's say over 100 episodes)
+    solved_min_reward = 200 # Solved when min reward is at least this
+    solved_n_episodes =  100 # for over this many episodes
     max_steps = 10**7
     replay_size = 100 # Maximum size of the replay buffer in episodes
     last_few = 50     

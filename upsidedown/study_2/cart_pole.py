@@ -27,7 +27,7 @@ class Behavior(torch.nn.Module):
         return self.classifier(x)
 
 @ex.command
-def train(checkpoint_path, batch_size, hidden_size, solved_mean_reward, solved_n_episodes, max_steps, 
+def train(checkpoint_path, batch_size, hidden_size, solved_min_reward, solved_n_episodes, max_steps, 
     replay_size, last_few, n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter,
     start_epsilon, eval_episodes, max_return):
     """
@@ -116,10 +116,10 @@ def train(checkpoint_path, batch_size, hidden_size, solved_mean_reward, solved_n
         # Stopping criteria
         rewards.extend(roll.rewards)
         rewards = rewards[-solved_n_episodes:]
-        eval_mean_reward = np.mean(rewards)
+        eval_min_reward = np.min(rewards)
 
-        if eval_mean_reward >= solved_mean_reward:
-            print(f"Task considered solved. Achieved {eval_mean_reward} >= {solved_mean_reward} over {solved_n_episodes} episodes.")
+        if eval_min_reward >= solved_min_reward:
+            print(f"Task considered solved. Achieved {eval_min_reward} >= {solved_min_reward} over {solved_n_episodes} episodes.")
             break
         
         if steps >= max_steps:
@@ -196,8 +196,8 @@ def run_config():
     
     # Train specific
     batch_size = 1024
-    solved_mean_reward = 195 # Considered solved when the average reward is greater than or equal to
-    solved_n_episodes  = 100 #  195.0 over 100 consecutive trials.
+    solved_min_reward = 195  # Considered solved when the min reward is greater than this
+    solved_n_episodes  = 100 # over this many consecutive trials.
     max_steps = 10**7
     replay_size = 100 # Maximum size of the replay buffer in episodes
     last_few = 50     
