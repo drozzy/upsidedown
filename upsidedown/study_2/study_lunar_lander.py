@@ -4,7 +4,7 @@ from sacred.observers import FileStorageObserver
 
 
 def study():
-    ex.observers.append(FileStorageObserver('studies'))
+    ex.observers.append(FileStorageObserver('experiments'))
 
     epsilons = [0.0, 0.01, 0.05]
     max_returns = [1, 10, 100, 300]
