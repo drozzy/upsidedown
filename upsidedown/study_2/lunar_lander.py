@@ -74,7 +74,7 @@ def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_
     rewards = []
 
     while True:
-        for _ in range(n_episodes_per_iter):
+        for _ in range(n_updates_per_iter):
             updates +=1
 
             x, y = rb.sample(batch_size, device)    
