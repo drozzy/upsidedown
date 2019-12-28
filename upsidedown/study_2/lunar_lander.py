@@ -35,7 +35,7 @@ class Behavior(nn.Module):
 
 @ex.command
 def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_size, solved_min_reward, solved_n_episodes, replay_size, last_few, 
-    n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, epsilon, eval_episodes, max_return, lr):
+    n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, epsilon, eval_episodes, eval_every_n_steps, max_return, lr):
     """
     Begin or resume training a policy.
     """
