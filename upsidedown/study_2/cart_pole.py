@@ -27,14 +27,15 @@ class Behavior(torch.nn.Module):
         return self.classifier(x)
 
 @ex.command
-def train(checkpoint_path, batch_size, hidden_size, solved_min_reward, solved_n_episodes, max_steps, 
+def train(_run, experiment_name, checkpoint_path, batch_size, hidden_size, solved_min_reward, solved_n_episodes, max_steps, 
     replay_size, last_few, n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter,
-    start_epsilon, eval_episodes, max_return):
+    epsilon, eval_episodes, max_return):
     """
     Begin or resume training a policy.
     """
+    log_dir = f'tensorboard/{_run._id}_{experiment_name}'
+    writer = SummaryWriter(log_dir=log_dir)
 
-    writer = SummaryWriter()
     env = gym.make('CartPole-v1')
 
     loss_object = torch.nn.BCEWithLogitsLoss().to(device)
@@ -87,7 +88,7 @@ def train(checkpoint_path, batch_size, hidden_size, solved_min_reward, solved_n_
         # Exploration
         roll = rollout(n_episodes_per_iter, env=env, 
             model=model, sample_action=True, replay_buffer=rb, 
-            device=device, action_fn=action_fn, epsilon=start_epsilon, max_return=max_return)
+            device=device, action_fn=action_fn, epsilon=epsilon, max_return=max_return)
         rb.add(roll.trajectories)
         
         steps += roll.length
@@ -193,6 +194,7 @@ def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, ma
 def run_config():
     hidden_size = 32
     max_return = 300 # Max return per episode 
+    epsilon = 0.0
     
     # Train specific
     batch_size = 1024
@@ -204,14 +206,12 @@ def run_config():
     n_warmup_episodes = 50
     n_episodes_per_iter = 10
     n_updates_per_iter = 100
-    start_epsilon = 0.1
     eval_episodes = 10
 
-    experiment_name = f'cartpole_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{start_epsilon}_ev{eval_episodes}'
+    experiment_name = f'cartpole_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_ev{eval_episodes}'
     checkpoint_path = f'checkpoint_{experiment_name}.pt'
 
     # Play specific
-    epsilon = 0.0
     sample_action = True
     play_episodes = 5
     dh = 200
