@@ -107,8 +107,9 @@ def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_
         
         # Eval
         steps_exceeded = steps >= max_steps
+        time_to_eval = ((steps - last_eval_step) >= eval_every_n_steps) or steps_exceeded
 
-        if (steps - last_eval_step) >= eval_every_n_steps or steps_exceeded:
+        if time_to_eval:
             last_eval_step = steps
 
             roll = rollout(eval_episodes, env=env, model=model, 
