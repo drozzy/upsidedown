@@ -35,7 +35,7 @@ class Behavior(nn.Module):
         return output
 
 @ex.command
-def train(_run, experiment_name, hidden_size, replay_size, last_few, lr):
+def train(_run, experiment_name, hidden_size, replay_size, last_few, lr, checkpoint_path):
     """
     Begin or resume training a policy.
     """
@@ -51,10 +51,6 @@ def train(_run, experiment_name, hidden_size, replay_size, last_few, lr):
 
     rb = ReplayBuffer(max_size=replay_size, last_few=last_few)
 
-    do_iterations(env=env, model=model, optimizer=optimizer, loss_object=loss_object, rb=rb, writer=writer)
-
-@ex.capture
-def do_iterations(env, model, optimizer, loss_object, rb, writer, checkpoint_path):
     print("Trying to load:")
     print(checkpoint_path)
     c = load_checkpoint(checkpoint_path, model, optimizer, device, train=True)
@@ -96,7 +92,7 @@ def do_eval(env, model, rb, writer, steps, rewards, last_eval_step, eval_episode
             max_return=max_return)
 
     steps_exceeded = steps >= max_steps
-    time_to_eval = ((steps - last_eval_step) >= eval_every_n_steps) or steps_exceeded
+    time_to_eval = ((steps - last_eval_step) >= eval_every_n_steps) or steps_exceeded or (last_eval_step == 0)
 
     if steps_exceeded:
         print(f"Steps {steps} exceeds max env steps {max_steps}.")
@@ -229,7 +225,7 @@ def run_config():
     eval_every_n_steps = 50_000
     max_return = 300
 
-    experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_ev{eval_episodes}'
+    experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_lr{lr}'
     checkpoint_path = f'checkpoint_{experiment_name}.pt'
 
 
