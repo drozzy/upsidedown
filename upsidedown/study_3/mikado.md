@@ -18,9 +18,7 @@ Take Additional input as action_prev
 
 Goal item
 ---------
--- Parent todo item
-    -- Child todo item
-        🍃 Leaf item
-☕️ Completed todo item
-    ☕️ Completed sub-item  
-🍃 Leaf item
+- Uncompleted parent item
+    🍃 Uncompleted leaf item
+- ☕️ Completed parent item
+    - ☕️ Completed leaf-item  
