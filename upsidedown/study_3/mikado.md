@@ -1,9 +1,3 @@
-Cleaup code
------------
-- ☕️ Get rid of action_fn
-- Get rid of initial random rollout
-    - 🍃 Make sampling of command work on an empty replay buffer    
-
 
 Take Additional input as action_prev
 -------------------------------------
@@ -22,3 +16,10 @@ Legend
     - 🍃 Uncompleted leaf item
 - ☕️ Completed parent item
     - ☕️ Completed leaf-item  
+
+☕️ Cleaup code
+-----------
+- ☕️ Get rid of action_fn
+- ☕️ Get rid of initial random rollout
+    - ☕️ Make sampling of command work on an empty replay buffer    
+
