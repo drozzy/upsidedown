@@ -92,9 +92,7 @@ def do_iterations(env, model, optimizer, loss_object, rb, writer, checkpoint_pat
     add_artifact()
 
 @ex.capture
-def do_iteration(env, model, optimizer, loss_object, rb, writer, updates, steps, checkpoint_path, batch_size, max_steps, 
-    solved_min_reward, solved_n_episodes, n_episodes_per_iter, n_updates_per_iter, 
-    epsilon, eval_episodes, eval_every_n_steps, max_return):
+def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, max_return):
 
     # Exploration    
     roll = rollout(n_episodes_per_iter, env=env, model=model, 
@@ -105,12 +103,21 @@ def do_iteration(env, model, optimizer, loss_object, rb, writer, updates, steps,
     steps += roll.length
     
     (dh, dr) = rb.sample_command()
-    writer.add_scalar('Train/dr', dr, steps)
-    writer.add_scalar('Train/dh', dh, steps)
+    writer.add_scalar('Exploration/dr', dr, steps)
+    writer.add_scalar('Exploration/dh', dh, steps)
 
-    writer.add_scalar('Train/reward', roll.mean_reward, steps)
-    writer.add_scalar('Train/length', roll.mean_length, steps)
+    writer.add_scalar('Exploration/reward', roll.mean_reward, steps)
+    writer.add_scalar('Exploration/length', roll.mean_length, steps)
 
+    return steps
+
+@ex.capture
+def do_iteration(env, model, optimizer, loss_object, rb, writer, updates, steps, checkpoint_path, batch_size, max_steps, 
+    solved_min_reward, solved_n_episodes, n_episodes_per_iter, n_updates_per_iter, 
+    epsilon, eval_episodes, eval_every_n_steps, max_return):
+
+    steps = do_exploration(env, model, rb, writer, steps)
+    
     # Updates    
     loss_sum = 0
     loss_count = 0
