@@ -233,6 +233,10 @@ class ReplayBuffer(object):
         return x, y
     
     def sample_command(self):
+        # Special case: when there is no experience yet
+        if len(self.buffer) == 0:
+            return 0, 0
+
         eps = self.buffer[:self.last_few]
         
         dh_0 = np.mean([e.length for e in eps])

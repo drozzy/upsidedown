@@ -2,6 +2,7 @@ import gym
 import os
 import numpy as np
 import random
+import datetime
 import torch
 from torch import nn
 from itertools import count
@@ -38,7 +39,8 @@ def train(_run, experiment_name, hidden_size, replay_size, last_few, lr):
     """
     Begin or resume training a policy.
     """
-    log_dir = f'tensorboard/{_run._id}_{experiment_name}'
+    run_id = _run._id or datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
+    log_dir = f'tensorboard/{run_id}_{experiment_name}'
     writer = SummaryWriter(log_dir=log_dir)
     env = gym.make('LunarLander-v2')
     
@@ -49,32 +51,7 @@ def train(_run, experiment_name, hidden_size, replay_size, last_few, lr):
 
     rb = ReplayBuffer(max_size=replay_size, last_few=last_few)
 
-    do_train(env=env, model=model, optimizer=optimizer, loss_object=loss_object, rb=rb, writer=writer)
-   
-@ex.capture 
-def do_train(env, model, optimizer, loss_object, rb, writer, checkpoint_path, 
-    n_warmup_episodes, max_return):
-
-    # Random rollout
-    roll = rollout(episodes=n_warmup_episodes, env=env, render=False, max_return=max_return)
-    rb.add(roll.trajectories)
-    print(f"Mean Episode Reward: {roll.mean_reward}")
-
-    # Keep track of steps used during random rollout!
-    print("Trying to load:")
-    print(checkpoint_path)
-    c = load_checkpoint(checkpoint_path, model, optimizer, device, train=True)
-    updates, steps, loss = c.updates, c.steps, c.loss
-
-    steps += roll.length
-    
-    save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=loss, updates=updates, steps=steps)
-
-    # Plot initial values
-    writer.add_scalar('Train/reward', roll.mean_reward, steps)   
-    writer.add_scalar('Train/length', roll.mean_length, steps)
-
-    do_iterations(env, model, optimizer, loss_object, rb, writer)
+    do_iterations(env=env, model=model, optimizer=optimizer, loss_object=loss_object, rb=rb, writer=writer)
 
 @ex.capture
 def do_iterations(env, model, optimizer, loss_object, rb, writer, checkpoint_path):
@@ -164,11 +141,11 @@ def do_updates(model, optimizer, loss_object, rb, writer, updates, steps, checkp
         loss = train_step(x, y, model, optimizer, loss_object)
         loss_sum += loss
         loss_count += 1            
-        writer.add_scalar('Loss/loss', loss, updates)
 
     # Save updated model
     avg_loss = loss_sum/loss_count
     print(f'u: {updates}, s: {steps}, Loss: {avg_loss}')
+    writer.add_scalar('Loss/avg_loss', avg_loss, steps)
 
     save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
     return updates
@@ -176,6 +153,10 @@ def do_updates(model, optimizer, loss_object, rb, writer, updates, steps, checkp
 
 @ex.capture
 def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, max_return):
+    # Plot the dr/dh that we are using for exploration state of things
+    (dh, dr) = rb.sample_command()
+    writer.add_scalar('Exploration/dr', dr, steps)
+    writer.add_scalar('Exploration/dh', dh, steps)
 
     # Exploration    
     roll = rollout(n_episodes_per_iter, env=env, model=model, 
@@ -185,10 +166,6 @@ def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, 
 
     steps += roll.length
     
-    (dh, dr) = rb.sample_command()
-    writer.add_scalar('Exploration/dr', dr, steps)
-    writer.add_scalar('Exploration/dh', dh, steps)
-
     writer.add_scalar('Exploration/reward', roll.mean_reward, steps)
     writer.add_scalar('Exploration/length', roll.mean_length, steps)
 
@@ -236,7 +213,7 @@ def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh
 def run_config():    
     train = True # Train or play?
     hidden_size = 32
-    epsilon = 0.0
+    epsilon = 0.1
 
     # Train specific
     lr = 0.005
@@ -246,14 +223,13 @@ def run_config():
     max_steps = 10**7
     replay_size = 100 # Maximum size of the replay buffer in episodes
     last_few = 50     
-    n_warmup_episodes = 30
     n_episodes_per_iter = 10
     n_updates_per_iter = 50
     eval_episodes = 100
     eval_every_n_steps = 50_000
     max_return = 300
 
-    experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_nw{n_warmup_episodes}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_ev{eval_episodes}'
+    experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_ev{eval_episodes}'
     checkpoint_path = f'checkpoint_{experiment_name}.pt'
 
 
