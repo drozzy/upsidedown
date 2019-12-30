@@ -52,9 +52,8 @@ def train(_run, experiment_name, hidden_size, replay_size, last_few, lr):
     do_train(env=env, model=model, optimizer=optimizer, loss_object=loss_object, rb=rb, writer=writer)
    
 @ex.capture 
-def do_train(env, model, optimizer, loss_object, rb, writer, checkpoint_path, batch_size, max_steps, 
-    solved_min_reward, solved_n_episodes, n_warmup_episodes, n_episodes_per_iter, n_updates_per_iter, 
-    epsilon, eval_episodes, eval_every_n_steps, max_return):
+def do_train(env, model, optimizer, loss_object, rb, writer, checkpoint_path, 
+    n_warmup_episodes, max_return):
 
     # Random rollout
     roll = rollout(episodes=n_warmup_episodes, env=env, render=False, max_return=max_return)
@@ -74,6 +73,18 @@ def do_train(env, model, optimizer, loss_object, rb, writer, checkpoint_path, ba
     # Plot initial values
     writer.add_scalar('Train/reward', roll.mean_reward, steps)   
     writer.add_scalar('Train/length', roll.mean_length, steps)
+
+    do_iterations(env, model, optimizer, loss_object, rb, writer)
+
+@ex.capture
+def do_iterations(env, model, optimizer, loss_object, rb, writer, checkpoint_path, batch_size, max_steps, 
+    solved_min_reward, solved_n_episodes, n_episodes_per_iter, n_updates_per_iter, 
+    epsilon, eval_episodes, eval_every_n_steps, max_return):
+    
+    print("Trying to load:")
+    print(checkpoint_path)
+    c = load_checkpoint(checkpoint_path, model, optimizer, device, train=True)
+    updates, steps, loss = c.updates, c.steps, c.loss
 
     loss_sum = 0
     loss_count = 0
