@@ -19,6 +19,6 @@ Take Additional input as action_prev
 Goal item
 ---------
 - Uncompleted parent item
-    🍃 Uncompleted leaf item
+    - 🍃 Uncompleted leaf item
 - ☕️ Completed parent item
     - ☕️ Completed leaf-item  
