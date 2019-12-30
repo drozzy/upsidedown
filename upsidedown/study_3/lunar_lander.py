@@ -77,86 +77,96 @@ def do_train(env, model, optimizer, loss_object, rb, writer, checkpoint_path,
     do_iterations(env, model, optimizer, loss_object, rb, writer)
 
 @ex.capture
-def do_iterations(env, model, optimizer, loss_object, rb, writer, checkpoint_path, batch_size, max_steps, 
-    solved_min_reward, solved_n_episodes, n_episodes_per_iter, n_updates_per_iter, 
-    epsilon, eval_episodes, eval_every_n_steps, max_return):
+def do_iterations(env, model, optimizer, loss_object, rb, writer, checkpoint_path):
     
     print("Trying to load:")
     print(checkpoint_path)
     c = load_checkpoint(checkpoint_path, model, optimizer, device, train=True)
     updates, steps, loss = c.updates, c.steps, c.loss
 
+    done = False
+    while not done:
+        updates, steps, done = do_iteration(env, model, optimizer, loss_object, rb, writer, updates=updates, 
+            steps=steps)
+
+    add_artifact()
+
+@ex.capture
+def do_iteration(env, model, optimizer, loss_object, rb, writer, updates, steps, checkpoint_path, batch_size, max_steps, 
+    solved_min_reward, solved_n_episodes, n_episodes_per_iter, n_updates_per_iter, 
+    epsilon, eval_episodes, eval_every_n_steps, max_return):
+    
     loss_sum = 0
     loss_count = 0
     rewards = []
     last_eval_step = 0
 
-    while True:
-        for _ in range(n_updates_per_iter):
-            updates +=1
+    for _ in range(n_updates_per_iter):
+        updates +=1
 
-            x, y = rb.sample(batch_size, device)    
-            loss = train_step(x, y, model, optimizer, loss_object)
-            loss_sum += loss
-            loss_count += 1            
-            writer.add_scalar('Loss/loss', loss, updates)
+        x, y = rb.sample(batch_size, device)    
+        loss = train_step(x, y, model, optimizer, loss_object)
+        loss_sum += loss
+        loss_count += 1            
+        writer.add_scalar('Loss/loss', loss, updates)
 
-        # Save updated model
-        avg_loss = loss_sum/loss_count
-        print(f'u: {updates}, s: {steps}, Loss: {avg_loss}')
+    # Save updated model
+    avg_loss = loss_sum/loss_count
+    print(f'u: {updates}, s: {steps}, Loss: {avg_loss}')
 
-        save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
+    save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
 
-        # Exploration    
-        roll = rollout(n_episodes_per_iter, env=env, model=model, 
-            sample_action=True, replay_buffer=rb, device=device, 
-            epsilon=epsilon, max_return=max_return)
-        rb.add(roll.trajectories)
+    # Exploration    
+    roll = rollout(n_episodes_per_iter, env=env, model=model, 
+        sample_action=True, replay_buffer=rb, device=device, 
+        epsilon=epsilon, max_return=max_return)
+    rb.add(roll.trajectories)
 
-        steps += roll.length
+    steps += roll.length
+    
+    (dh, dr) = rb.sample_command()
+    writer.add_scalar('Train/dr', dr, steps)
+    writer.add_scalar('Train/dh', dh, steps)
+
+    writer.add_scalar('Train/reward', roll.mean_reward, steps)
+    writer.add_scalar('Train/length', roll.mean_length, steps)
+    
+    # Eval
+    steps_exceeded = steps >= max_steps
+    time_to_eval = ((steps - last_eval_step) >= eval_every_n_steps) or steps_exceeded
+
+    if time_to_eval:
+        last_eval_step = steps
+
+        roll = rollout(eval_episodes, env=env, model=model, 
+                sample_action=True, replay_buffer=rb, 
+                device=device, evaluation=True,
+                max_return=max_return)
+
+        (dh, dr) = rb.eval_command()
+        writer.add_scalar('Eval/dr', dr, steps)
+        writer.add_scalar('Eval/dh', dh, steps)
         
-        (dh, dr) = rb.sample_command()
-        writer.add_scalar('Train/dr', dr, steps)
-        writer.add_scalar('Train/dh', dh, steps)
-
-        writer.add_scalar('Train/reward', roll.mean_reward, steps)
-        writer.add_scalar('Train/length', roll.mean_length, steps)
+        writer.add_scalar('Eval/reward', roll.mean_reward, steps) 
+        writer.add_scalar('Eval/length', roll.mean_length, steps)
         
-        # Eval
-        steps_exceeded = steps >= max_steps
-        time_to_eval = ((steps - last_eval_step) >= eval_every_n_steps) or steps_exceeded
+        print(f"Eval Episode Mean Reward: {roll.mean_reward}")      
 
-        if time_to_eval:
-            last_eval_step = steps
+        # Stopping criteria
+        rewards.extend(roll.rewards)
+        rewards = rewards[-solved_n_episodes:]
+        eval_min_reward = np.min(rewards)
 
-            roll = rollout(eval_episodes, env=env, model=model, 
-                    sample_action=True, replay_buffer=rb, 
-                    device=device, evaluation=True,
-                    max_return=max_return)
+        if eval_min_reward >= solved_min_reward:
+            print(f"Task considered solved. Achieved {eval_min_reward} >= {solved_min_reward} over {solved_n_episodes} episodes.")
+            return updates, steps, True
+    
+    if steps_exceeded:
+        print(f"Steps {steps} exceeds max env steps {max_steps}. Stopping.")
+        return updates, steps, True
 
-            (dh, dr) = rb.eval_command()
-            writer.add_scalar('Eval/dr', dr, steps)
-            writer.add_scalar('Eval/dh', dh, steps)
-            
-            writer.add_scalar('Eval/reward', roll.mean_reward, steps) 
-            writer.add_scalar('Eval/length', roll.mean_length, steps)
-            
-            print(f"Eval Episode Mean Reward: {roll.mean_reward}")      
+    return updates, steps, False  
 
-            # Stopping criteria
-            rewards.extend(roll.rewards)
-            rewards = rewards[-solved_n_episodes:]
-            eval_min_reward = np.min(rewards)
-
-            if eval_min_reward >= solved_min_reward:
-                print(f"Task considered solved. Achieved {eval_min_reward} >= {solved_min_reward} over {solved_n_episodes} episodes.")
-                break
-        
-        if steps_exceeded:
-            print(f"Steps {steps} exceeds max env steps {max_steps}. Stopping.")
-            break  
-
-    add_artifact()
 
 @ex.capture
 def add_artifact(checkpoint_path):

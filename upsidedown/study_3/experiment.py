@@ -124,7 +124,6 @@ def save_checkpoint(path, model, optimizer, loss, updates, steps):
             path)
     
 def load_checkpoint(path, model, optimizer, device, train=True):
-    epoch = 0
     loss = 0.0    
     steps = 0
     updates = 0
@@ -135,7 +134,7 @@ def load_checkpoint(path, model, optimizer, device, train=True):
         loss = checkpoint['loss']
         updates = checkpoint['updates']
         steps = checkpoint['steps']
-        print(f"Existing model found. Loading from epoch {epoch}, steps {steps} with loss: {loss}")
+        print(f"Existing model found. Loading from steps: {steps}, updates: {updates}, with loss: {loss}")
     else:
         print("No checkpoint found. Creating new model.")
 
