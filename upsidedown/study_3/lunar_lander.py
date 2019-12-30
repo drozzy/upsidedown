@@ -95,7 +95,23 @@ def do_iterations(env, model, optimizer, loss_object, rb, writer, checkpoint_pat
 def do_iteration(env, model, optimizer, loss_object, rb, writer, updates, steps, checkpoint_path, batch_size, max_steps, 
     solved_min_reward, solved_n_episodes, n_episodes_per_iter, n_updates_per_iter, 
     epsilon, eval_episodes, eval_every_n_steps, max_return):
+
+    # Exploration    
+    roll = rollout(n_episodes_per_iter, env=env, model=model, 
+        sample_action=True, replay_buffer=rb, device=device, 
+        epsilon=epsilon, max_return=max_return)
+    rb.add(roll.trajectories)
+
+    steps += roll.length
     
+    (dh, dr) = rb.sample_command()
+    writer.add_scalar('Train/dr', dr, steps)
+    writer.add_scalar('Train/dh', dh, steps)
+
+    writer.add_scalar('Train/reward', roll.mean_reward, steps)
+    writer.add_scalar('Train/length', roll.mean_length, steps)
+
+    # Updates    
     loss_sum = 0
     loss_count = 0
     rewards = []
@@ -115,21 +131,6 @@ def do_iteration(env, model, optimizer, loss_object, rb, writer, updates, steps,
     print(f'u: {updates}, s: {steps}, Loss: {avg_loss}')
 
     save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
-
-    # Exploration    
-    roll = rollout(n_episodes_per_iter, env=env, model=model, 
-        sample_action=True, replay_buffer=rb, device=device, 
-        epsilon=epsilon, max_return=max_return)
-    rb.add(roll.trajectories)
-
-    steps += roll.length
-    
-    (dh, dr) = rb.sample_command()
-    writer.add_scalar('Train/dr', dr, steps)
-    writer.add_scalar('Train/dh', dh, steps)
-
-    writer.add_scalar('Train/reward', roll.mean_reward, steps)
-    writer.add_scalar('Train/length', roll.mean_length, steps)
     
     # Eval
     steps_exceeded = steps >= max_steps
