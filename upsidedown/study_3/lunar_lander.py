@@ -92,7 +92,7 @@ def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_
 
         # Exploration    
         roll = rollout(n_episodes_per_iter, env=env, model=model, 
-            sample_action=True, replay_buffer=rb, device=device, action_fn=action_fn, 
+            sample_action=True, replay_buffer=rb, device=device, 
             epsilon=epsilon, max_return=max_return)
         rb.add(roll.trajectories)
 
@@ -114,7 +114,7 @@ def train(_run, experiment_name, checkpoint_path, batch_size, max_steps, hidden_
 
             roll = rollout(eval_episodes, env=env, model=model, 
                     sample_action=True, replay_buffer=rb, 
-                    device=device, action_fn=action_fn, evaluation=True,
+                    device=device, evaluation=True,
                     max_return=max_return)
 
             (dh, dr) = rb.eval_command()
@@ -155,19 +155,7 @@ def train_step(inputs, targets, model, optimizer, loss_object):
     
     return loss
 
-def action_fn(env, model, inputs, sample_action, epsilon):
-    action_logits = model([inputs[:, :-2], inputs[:, -2:]])
-    action_probs = torch.softmax(action_logits, axis=-1)
 
-    if random.random() < epsilon: # Random action
-        return env.action_space.sample()
-    
-    if sample_action:        
-        m = torch.distributions.categorical.Categorical(logits=action_logits)             
-        action = int(m.sample().squeeze().cpu().numpy())        
-    else:
-        action = int(np.argmax(action_probs.detach().squeeze().numpy()))
-    return action
 
 @ex.command
 def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh, dr):
@@ -186,7 +174,7 @@ def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh
 
     for _ in range(play_episodes):
         roll = rollout(episodes=1, env=env, model=model, sample_action=sample_action, 
-                              cmd=cmd, render=True, device=device, action_fn=action_fn)
+                              cmd=cmd, render=True, device=device)
 
         print(f"Episode Reward: {roll.mean_reward}")
 

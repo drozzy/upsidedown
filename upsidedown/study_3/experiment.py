@@ -7,9 +7,22 @@ import time
 import random
 import torch.nn as nn
            
+def get_action(env, model, inputs, sample_action, epsilon):
+    action_logits = model([inputs[:, :-2], inputs[:, -2:]])
+    action_probs = torch.softmax(action_logits, axis=-1)
+
+    if random.random() < epsilon: # Random action
+        return env.action_space.sample()
+    
+    if sample_action:        
+        m = torch.distributions.categorical.Categorical(logits=action_logits)             
+        action = int(m.sample().squeeze().cpu().numpy())        
+    else:
+        action = int(np.argmax(action_probs.detach().squeeze().numpy()))
+    return action
 
 def rollout_episode(env, model, sample_action, cmd, 
-                    render, device, action_fn, epsilon, max_return=300):
+                    render, device, epsilon, max_return=300):
     s = env.reset()
     done = False
     ep_reward = 0.0
@@ -25,7 +38,7 @@ def rollout_episode(env, model, sample_action, cmd,
             inputs = torch.tensor([to_training(s, dr, dh)]).float().to(device)
             with torch.no_grad():
                 model.eval()
-                action = action_fn(env, model, inputs, sample_action, epsilon=epsilon)
+                action = get_action(env, model, inputs, sample_action, epsilon=epsilon)
                 model.train()
         
         if render:
@@ -47,7 +60,7 @@ def rollout_episode(env, model, sample_action, cmd,
     return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
-            replay_buffer=None, device=None, action_fn=None, evaluation=False, epsilon=-1.0, max_return=300):
+            replay_buffer=None, device=None, evaluation=False, epsilon=-1.0, max_return=300):
     """
     @param model: Model to user to select action. If None selects random action.
     @param cmd: If None will be sampled from the replay buffer.
@@ -67,7 +80,7 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
                 cmd = replay_buffer.sample_command()
             
         t, reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
-                            render=render, device=device, action_fn=action_fn, epsilon=epsilon)            
+                            render=render, device=device, epsilon=epsilon)            
         
         trajectories.append(t)
         length += t.length
