@@ -16,8 +16,8 @@ Take Additional input as action_prev
             - 🍃 split x into s, dr, dh
 
 
-Goal item
----------
+Legend
+------
 - Uncompleted parent item
     - 🍃 Uncompleted leaf item
 - ☕️ Completed parent item
