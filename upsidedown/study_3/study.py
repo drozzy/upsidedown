@@ -11,8 +11,7 @@ def study():
 
     for hidden_size in hidden_sizes:        
             ex.run(config_updates={
-                'hidden_size': hidden_size,
-                'max_steps' : 100
+                'hidden_size': hidden_size
             })
 
 if __name__ == '__main__':
