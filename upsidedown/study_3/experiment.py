@@ -318,31 +318,17 @@ class Behavior(nn.Module):
         self.fc2 = nn.Linear(hidden_size, num_actions)
 
     def forward(self, prev_action, state, dr, dh):
-        # print(f'Prev action shape: {prev_action.shape}')
-
         output_prev_action = self.emb_prev_action(prev_action)
-        # print(f'Output prev action shape: {output_prev_action.shape}')
-        # print(f"State shape: {state.shape}")
-        # print(f"Dr shape: {dr.shape}")
-        # print(f"Dh shape: {dh.shape}")
         output_state = self.fc_state(state)
-        # print(f"State Output shape: {output_state.shape}")
-
         output_dr = torch.sigmoid(self.fc_dr(dr * self.return_scale))
-        # print(f"Dr Output shape: {output_dr.shape}")
         output_dh = torch.sigmoid(self.fc_dh(dh * self.horizon_scale))
-        # print(f"Dh Output shape: {output_dh.shape}")
-
         
         sum1 = (output_prev_action + output_state)
-        # print(f'Sum1.shape: {sum1.shape}')
         sum2 = (output_dr + output_dh)
-        # print(f'Sum2.shape: {sum2.shape}')
         output = sum1 * sum2 # TODO: Is this a good way to combine these?
         
         output = torch.relu(self.fc1(output))
         output = self.fc2(output)
-        # print(f'Output shape: {output.shape}')
         return output
 
 @ex.command
@@ -487,8 +473,6 @@ def add_artifact(checkpoint_path):
 def train_step(sample, model, optimizer, loss_object):
     optimizer.zero_grad()    
     predictions = model(prev_action=sample.prev_action, state=sample.state, dr=sample.dr, dh=sample.dh)
-    # print(f'Pred shape: {predictions.shape}')
-    # print(f'Sample action.shape: {sample.action.shape}')
     loss = loss_object(predictions, sample.action)
     
     loss.backward()
@@ -555,7 +539,4 @@ def run_config():
 
 @ex.automain
 def main():
-    """
-    Default runs train() command
-    """
     train()
