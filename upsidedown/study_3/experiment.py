@@ -14,6 +14,15 @@ from sacred import Experiment
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 ex = Experiment()
+
+# Segment from a trajectory (numpy, single elements)
+Segment = namedtuple('Segment', ['prev_action', 'state', 'dr', 'dh', 'action'])
+
+# Batch-sized sample from the replay buffer, each element already a torch.tensor on device
+Sample = namedtuple('Sample', ['prev_action', 'state', 'dr', 'dh', 'action'])
+
+# Command expressing desired quantities (numpy, single elements) 
+Command = namedtuple('Command', ['dr', 'dh'])
            
 def get_action(env, model, prev_action, state, cmd, sample_action, epsilon, device):
     prev_action = torch.tensor(prev_action).long().unsqueeze(dim=0).to(device)
@@ -33,8 +42,6 @@ def get_action(env, model, prev_action, state, cmd, sample_action, epsilon, devi
     else:
         action = int(np.argmax(action_probs.detach().squeeze().numpy()))
     return action
-
-Command = namedtuple('Command', ['dr', 'dh'])
 
 def rollout_episode(env, model, sample_action, cmd, 
                     render, device, epsilon, max_return=300):
@@ -203,10 +210,6 @@ class Trajectory(object):
 
         return Segment(prev_action=prev_action, state=state, dr=d_r, dh=d_h, action=action)
 
-Segment = namedtuple('Segment', ['prev_action', 'state', 'dr', 'dh', 'action'])
-
-# Batch-sized sample from the replay buffer, each element already a torch.tensor on device
-Sample = namedtuple('Sample', ['prev_action', 'state', 'dr', 'dh', 'action'])
 
 class ReplayBuffer(object):
     
