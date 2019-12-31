@@ -401,8 +401,9 @@ def do_eval(env, model, rb, writer, steps, rewards, last_eval_step, eval_episode
     solved = eval_min_reward >= solved_min_reward
     if solved:
         print(f"Task considered solved. Achieved {eval_min_reward} >= {solved_min_reward} over {solved_n_episodes} episodes.")
-        
-    return last_eval_step, solved
+    
+    done = solved or steps_exceeded
+    return last_eval_step, done
  
 
 @ex.capture

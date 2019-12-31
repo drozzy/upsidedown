@@ -1,4 +1,4 @@
-from lunar_lander import ex
+from experiment import ex
 
 from sacred.observers import FileStorageObserver
 
@@ -6,14 +6,13 @@ from sacred.observers import FileStorageObserver
 def study():
     ex.observers.append(FileStorageObserver('experiments'))
 
-    epsilons = [0.0, 0.01, 0.05]
-    max_returns = [1, 10, 100, 300]
+    # Repeat a few times
+    hidden_sizes = [8, 32, 128, 8, 32, 128, 8, 32, 128]
 
-    for epsilon in epsilons:
-        for max_return in max_returns:
+    for hidden_size in hidden_sizes:        
             ex.run(config_updates={
-                'epsilon': epsilon,
-                'max_return' : max_return
+                'hidden_size': hidden_size,
+                'max_steps' : 100
             })
 
 if __name__ == '__main__':
