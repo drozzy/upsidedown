@@ -14,19 +14,33 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 ex = Experiment()
 
 class Behavior(nn.Module):
-    def __init__(self, hidden_size, state_shape, cmd_shape, num_actions):
+    @ex.capture
+    def __init__(self, hidden_size, state_shape, num_actions, return_scale, horizon_scale):
         super(Behavior, self).__init__()
+        self.return_scale = return_scale
+        self.horizon_scale = horizon_scale
+
         self.fc_state = nn.Linear(state_shape, hidden_size)
-        self.fc_cmd = nn.Linear(cmd_shape, hidden_size)
+        self.fc_dr = nn.Linear(1, hidden_size)
+        self.fc_dh = nn.Linear(1, hidden_size)
         
         self.fc1 = nn.Linear(hidden_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, num_actions)
 
-    def forward(self, x):
-        output_spate = self.fc_state(x[0])
-        output_cmd = torch.sigmoid(self.fc_cmd(x[1]))
+    def forward(self, state, dr, dh):
+        # print(f"State shape: {state.shape}")
+        # print(f"Dr shape: {dr.shape}")
+        # print(f"Dh shape: {dh.shape}")
+        output_state = self.fc_state(state)
+        # print(f"State Output shape: {output_state.shape}")
         
-        output = output_spate * output_cmd
+        output_dr = torch.sigmoid(self.fc_dr(dr * self.return_scale))
+        # print(f"Dr Output shape: {output_dr.shape}")
+        output_dh = torch.sigmoid(self.fc_dh(dh * self.horizon_scale))
+        # print(f"Dh Output shape: {output_dh.shape}")
+
+        
+        output = output_state * (output_dr + output_dh) # TODO: Is this a good way to combine these?
         
         output = torch.relu(self.fc1(output))
         output = self.fc2(output)
@@ -44,7 +58,7 @@ def train(_run, experiment_name, hidden_size, replay_size, last_few, lr, checkpo
     
     loss_object = torch.nn.CrossEntropyLoss().to(device)
     
-    model = Behavior(hidden_size=hidden_size, state_shape=env.observation_space.shape[0], cmd_shape=2, num_actions=env.action_space.n).to(device)
+    model = Behavior(hidden_size=hidden_size, state_shape=env.observation_space.shape[0], num_actions=env.action_space.n).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     rb = ReplayBuffer(max_size=replay_size, last_few=last_few)
@@ -131,8 +145,9 @@ def do_updates(model, optimizer, loss_object, rb, writer, updates, steps, checkp
     for _ in range(n_updates_per_iter):
         updates +=1
 
-        x, y = rb.sample(batch_size, device)    
-        loss = train_step(x, y, model, optimizer, loss_object)
+        sample = rb.sample(batch_size, device)    
+
+        loss = train_step(sample, model, optimizer, loss_object)
         loss_sum += loss
         loss_count += 1            
 
@@ -147,10 +162,11 @@ def do_updates(model, optimizer, loss_object, rb, writer, updates, steps, checkp
 
 @ex.capture
 def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, max_return):
-    # Plot the dr/dh that we are using for exploration state of things
-    (dh, dr) = rb.sample_command()
-    writer.add_scalar('Exploration/dr', dr, steps)
-    writer.add_scalar('Exploration/dh', dh, steps)
+    # Plot a sample dr/dh at this time
+    example_cmd = rb.sample_command()
+
+    writer.add_scalar('Exploration/dr', example_cmd.dr, steps)
+    writer.add_scalar('Exploration/dh', example_cmd.dh, steps)
 
     # Exploration    
     roll = rollout(n_episodes_per_iter, env=env, model=model, 
@@ -169,16 +185,15 @@ def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, 
 def add_artifact(checkpoint_path):
     ex.add_artifact(checkpoint_path, name='checkpoint.pt')
            
-def train_step(inputs, targets, model, optimizer, loss_object):
+def train_step(sample, model, optimizer, loss_object):
     optimizer.zero_grad()    
-    predictions = model([inputs[:, :-2], inputs[:, -2:]])
-    loss = loss_object(predictions, targets)
+    predictions = model(state=sample.state, dr=sample.dr, dh=sample.dh)
+    loss = loss_object(predictions, sample.action)
     
     loss.backward()
     optimizer.step()
     
     return loss
-
 
 
 @ex.command
@@ -187,10 +202,10 @@ def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh
     Play episodes using a trained policy. 
     """
     env = gym.make('LunarLander-v2')
-    cmd = (dh, dr)
+    cmd = Command(dr=dr, dh=dh)
 
     loss_object = torch.nn.CrossEntropyLoss().to(device)
-    model = Behavior(hidden_size=hidden_size,state_shape=env.observation_space.shape[0], cmd_shape=2, num_actions=env.action_space.n).to(device)
+    model = Behavior(hidden_size=hidden_size,state_shape=env.observation_space.shape[0], num_actions=env.action_space.n).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
     c = load_checkpoint(name=checkpoint_path, train=False, 
@@ -208,6 +223,8 @@ def run_config():
     train = True # Train or play?
     hidden_size = 32
     epsilon = 0.1
+    return_scale = 0.01
+    horizon_scale = 0.01
 
     # Train specific
     lr = 0.005

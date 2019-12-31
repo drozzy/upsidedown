@@ -2,13 +2,18 @@ import numpy as np
 import torch
 from scipy.stats import median_absolute_deviation
 import os
+from collections import namedtuple
 import torch.nn.functional as F
 import time 
 import random
 import torch.nn as nn
            
-def get_action(env, model, inputs, sample_action, epsilon):
-    action_logits = model([inputs[:, :-2], inputs[:, -2:]])
+def get_action(env, model, state, cmd, sample_action, epsilon, device):
+    dr = torch.tensor(cmd.dr).float().unsqueeze(dim=0).to(device)
+    dh = torch.tensor(cmd.dh).float().unsqueeze(dim=0).to(device)
+    state = torch.tensor(state).float().unsqueeze(dim=0).to(device)
+
+    action_logits = model(state=state, dr=dr, dh=dh)
     action_probs = torch.softmax(action_logits, axis=-1)
 
     if random.random() < epsilon: # Random action
@@ -20,6 +25,8 @@ def get_action(env, model, inputs, sample_action, epsilon):
     else:
         action = int(np.argmax(action_probs.detach().squeeze().numpy()))
     return action
+
+Command = namedtuple('Command', ['dr', 'dh'])
 
 def rollout_episode(env, model, sample_action, cmd, 
                     render, device, epsilon, max_return=300):
@@ -33,12 +40,17 @@ def rollout_episode(env, model, sample_action, cmd,
         if model is None:
             action = env.action_space.sample()
         else:            
-            (dh, dr) = cmd
-                
-            inputs = torch.tensor([to_training(s, dr, dh)]).float().to(device)
+            # (dh, dr) = cmd
+            # (s, dr, dh), action = segment
+            # # l = to_training(s, dr, dh)
+            # s_batch.append(s)
+            # dr_batch.append(dr)
+            # dh_batch.append(dh)
+
+            # inputs = torch.tensor([to_training(s, dr, dh)]).float().to(device)
             with torch.no_grad():
                 model.eval()
-                action = get_action(env, model, inputs, sample_action, epsilon=epsilon)
+                action = get_action(env, model, state=s, cmd=cmd, sample_action=sample_action, epsilon=epsilon, device=device)
                 model.train()
         
         if render:
@@ -49,9 +61,10 @@ def rollout_episode(env, model, sample_action, cmd,
         s, reward, done, info = env.step(action)
         
         if model is not None:
-            dh = max(dh - 1, 1)
-            dr = min(dr - reward, max_return)
-            cmd = (dh, dr)
+            dh = max(cmd.dh - 1, 1)
+            dr = min(cmd.dr - reward, max_return)
+            cmd = Command(dr=dr, dh=dh)
+            # cmd = (dh, dr)
             
         t.add(s_old, action, reward, s)        
         ep_reward += reward
@@ -60,7 +73,7 @@ def rollout_episode(env, model, sample_action, cmd,
     return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
-            replay_buffer=None, device=None, evaluation=False, epsilon=-1.0, max_return=300):
+            replay_buffer=None, device=None, evaluation=False, epsilon=0.0, max_return=300):
     """
     @param model: Model to user to select action. If None selects random action.
     @param cmd: If None will be sampled from the replay buffer.
@@ -187,7 +200,10 @@ class Trajectory(object):
         d_h = t2 - t1 + 1.0
 
         return ((state,d_r,d_h),action)
-    
+
+# Batch-sized sample from the replay buffer, each element already a torch.tensor on device
+Sample = namedtuple('Sample', ['state', 'dr', 'dh', 'action'])
+
 class ReplayBuffer(object):
     
     def __init__(self, max_size, last_few):
@@ -213,29 +229,40 @@ class ReplayBuffer(object):
     
     def sample(self, batch_size, device):
         trajectories = np.random.choice(self.buffer, batch_size, replace=True)
-        x = []
-        y = []
+        # x = []
+        action_batch = []
+        s_batch  = []
+        dr_batch = []
+        dh_batch = []
         for t in trajectories:
             
             segment = t.sample_segment()
-            
-                        
-            
             (s, dr, dh), action = segment
-            l = to_training(s, dr, dh)
+            # l = to_training(s, dr, dh)
+            s_batch.append(s)
+            dr_batch.append(dr)
+            dh_batch.append(dh)
+            # l = s.tolist()
+            # l.append(dh*horizon_scale)
+            # l.append(dr*return_scale)
             
-            x.append(l)
-            y.append(action)
-            
-        x = torch.tensor(x).to(device)
-        y = torch.tensor(y).to(device)
+            action_batch.append(action)
 
-        return x, y
+        s_batch = torch.tensor(s_batch).to(device)
+        dr_batch = torch.tensor(dr_batch).unsqueeze(dim=1).to(device)
+        dh_batch = torch.tensor(dh_batch).unsqueeze(dim=1).to(device)
+
+        # x.append(l)
+            
+        # x = torch.tensor(x).to(device)
+        action_batch = torch.tensor(action_batch).to(device)
+
+        return Sample(state=s_batch, dr=dr_batch, dh=dh_batch, action=action_batch)
     
     def sample_command(self):
         # Special case: when there is no experience yet
         if len(self.buffer) == 0:
-            return 0, 0
+            return Command(dr=0, dh=0)
 
         eps = self.buffer[:self.last_few]
         
@@ -247,7 +274,7 @@ class ReplayBuffer(object):
         
         dr_0 = np.random.uniform(m, m + s)
         
-        return dh_0, dr_0
+        return Command(dh=dh_0, dr=dr_0)
 
     def eval_command(self):
         eps = self.buffer[:self.last_few]
@@ -256,4 +283,4 @@ class ReplayBuffer(object):
         
         dr_0 = np.min([e.total_return for e in eps])
         
-        return dh_0, dr_0
+        return Command(dh=dh_0, dr=dr_0)
