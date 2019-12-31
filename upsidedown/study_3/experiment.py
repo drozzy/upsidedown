@@ -49,14 +49,6 @@ def rollout_episode(env, model, sample_action, cmd,
         if model is None:
             action = env.action_space.sample()
         else:            
-            # (dh, dr) = cmd
-            # (s, dr, dh), action = segment
-            # # l = to_training(s, dr, dh)
-            # s_batch.append(s)
-            # dr_batch.append(dr)
-            # dh_batch.append(dh)
-
-            # inputs = torch.tensor([to_training(s, dr, dh)]).float().to(device)
             with torch.no_grad():
                 model.eval()
                 action = get_action(env, model, prev_action=prev_action, state=s, cmd=cmd, sample_action=sample_action, epsilon=epsilon, device=device)
@@ -73,7 +65,6 @@ def rollout_episode(env, model, sample_action, cmd,
             dh = max(cmd.dh - 1, 1)
             dr = min(cmd.dr - reward, max_return)
             cmd = Command(dr=dr, dh=dh)
-            # cmd = (dh, dr)
             
         t.add(prev_action, s_old, action, reward, s)    
         prev_action = action    
@@ -242,7 +233,6 @@ class ReplayBuffer(object):
     
     def sample(self, batch_size, device):
         trajectories = np.random.choice(self.buffer, batch_size, replace=True)
-        # x = []
         prev_action_batch = []
         action_batch = []
         s_batch  = []
@@ -251,15 +241,11 @@ class ReplayBuffer(object):
         for t in trajectories:
             
             segment = t.sample_segment()
-            # prev_action, (s, dr, dh), action = segment
-            # l = to_training(s, dr, dh)
+
             s_batch.append(segment.state)
             dr_batch.append(segment.dr)
             dh_batch.append(segment.dh)
             prev_action_batch.append(segment.prev_action)
-            # l = s.tolist()
-            # l.append(dh*horizon_scale)
-            # l.append(dr*return_scale)
             
             action_batch.append(segment.action)
 
@@ -268,9 +254,6 @@ class ReplayBuffer(object):
         dh_batch = torch.tensor(dh_batch).unsqueeze(dim=1).to(device)
         prev_action_batch = torch.tensor(prev_action_batch).long().to(device)
 
-        # x.append(l)
-            
-        # x = torch.tensor(x).to(device)
         action_batch = torch.tensor(action_batch).to(device)
 
         return Sample(prev_action=prev_action_batch, state=s_batch, dr=dr_batch, dh=dh_batch, action=action_batch)
@@ -286,7 +269,6 @@ class ReplayBuffer(object):
         
         m = np.mean([e.total_return for e in eps])
         s = np.std([e.total_return for e in eps])
-#         s = median_absolute_deviation([e.total_return for e in eps])
         
         dr_0 = np.random.uniform(m, m + s)
         
