@@ -11,8 +11,6 @@ from experiment import rollout, ReplayBuffer, Trajectory, load_checkpoint, save_
 from sacred import Experiment
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-from sacred.stflow import LogFileWriter
-
 ex = Experiment()
 
 class Behavior(nn.Module):
