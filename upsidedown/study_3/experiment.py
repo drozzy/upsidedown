@@ -2,6 +2,8 @@ from collections import namedtuple
 import torch.nn.functional as F
 import time 
 import gym
+from itertools import cycle
+
 import os
 import numpy as np
 import random
@@ -26,10 +28,9 @@ Command = namedtuple('Command', ['dr', 'dh'])
            
 def get_action(env, model, prev_action, state, cmd, sample_action, epsilon, device):
     prev_action = torch.tensor(prev_action).long().unsqueeze(dim=0).to(device)
-    dr = torch.tensor(cmd.dr).float().unsqueeze(dim=0).to(device)
-    dh = torch.tensor(cmd.dh).float().unsqueeze(dim=0).to(device)
+    dr = torch.tensor([cmd.dr]).float().unsqueeze(dim=0).to(device)
+    dh = torch.tensor([cmd.dh]).float().unsqueeze(dim=0).to(device)
     state = torch.tensor(state).float().unsqueeze(dim=0).to(device)
-
     action_logits = model(prev_action=prev_action, state=state, dr=dr, dh=dh)
     action_probs = torch.softmax(action_logits, axis=-1)
 
@@ -127,13 +128,6 @@ class Rollout(object):
     def mean_reward(self):
         return np.mean(self.rewards)
 
-
-def to_training(s, dr, dh, return_scale=0.01, horizon_scale=0.01):
-    l = s.tolist()
-    l.append(dh*horizon_scale)
-    l.append(dr*return_scale)
-    return l
-
 def save_checkpoint(path, model, optimizer, loss, updates, steps):
     
     torch.save({
@@ -198,6 +192,7 @@ class Trajectory(object):
         T = self.length
 
         t1 = random.randint(1, T)
+        # t1 = int(random.random() * (T+1)) # THIS IS FASTER by about 1/4
         t2 = T #random.randint(t1, T)
         
         prev_action = self.trajectory[t1-1][0]
@@ -241,6 +236,7 @@ class ReplayBuffer(object):
         s_batch  = []
         dr_batch = []
         dh_batch = []
+
         for t in trajectories:
             
             segment = t.sample_segment()
@@ -251,8 +247,10 @@ class ReplayBuffer(object):
             prev_action_batch.append(segment.prev_action)
             
             action_batch.append(segment.action)
+            if len(s_batch) >= batch_size:
+                break
 
-        s_batch = torch.tensor(s_batch).to(device)
+        s_batch = torch.tensor(s_batch).float().to(device)
         dr_batch = torch.tensor(dr_batch).unsqueeze(dim=1).to(device)
         dh_batch = torch.tensor(dh_batch).unsqueeze(dim=1).to(device)
         prev_action_batch = torch.tensor(prev_action_batch).long().to(device)
@@ -296,35 +294,39 @@ class Behavior(nn.Module):
         # Extra action representation for "start" of episode action.
         self.emb_prev_action = torch.nn.Embedding(num_embeddings=num_actions+1, embedding_dim=hidden_size)
         self.fc_state = nn.Linear(state_shape, hidden_size)
+        self.fc_attn_scores = nn.Linear(state_shape, state_shape)
         self.fc_dr = nn.Linear(1, hidden_size)
         self.fc_dh = nn.Linear(1, hidden_size)
         
-        self.fc1 = nn.Linear(hidden_size, hidden_size)
+        self.fc1 = nn.Linear(hidden_size * 4, hidden_size)
         self.fc2 = nn.Linear(hidden_size, num_actions)
 
     def forward(self, prev_action, state, dr, dh):
         output_prev_action = self.emb_prev_action(prev_action)
-        output_state = self.fc_state(state)
+        attn_scores = self.fc_attn_scores(state)
+        output_state = self.fc_state(torch.softmax(attn_scores, dim=1) * state)
         output_dr = torch.sigmoid(self.fc_dr(dr * self.return_scale))
         output_dh = torch.sigmoid(self.fc_dh(dh * self.horizon_scale))
+
+        output = torch.cat([output_prev_action, output_state, output_dr, output_dh], 1)
         
-        sum1 = (output_prev_action + output_state)
-        sum2 = (output_dr + output_dh)
-        output = sum1 * sum2 # TODO: Is this a good way to combine these?
+        # sum1 = (output_prev_action + output_state)
+        # sum2 = (output_dr + output_dh)
+        # output = sum1 * sum2 # TODO: Is this a good way to combine these?
         
         output = torch.relu(self.fc1(output))
         output = self.fc2(output)
         return output
 
 @ex.command
-def train(_run, experiment_name, hidden_size, replay_size, last_few, lr, checkpoint_path):
+def train(env_name, _run, experiment_name, hidden_size, replay_size, last_few, lr, checkpoint_path):
     """
     Begin or resume training a policy.
     """
     run_id = _run._id or datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     log_dir = f'tensorboard/{run_id}_{experiment_name}'
     writer = SummaryWriter(log_dir=log_dir)
-    env = gym.make('LunarLander-v2')
+    env = gym.make(env_name)
     
     loss_object = torch.nn.CrossEntropyLoss().to(device)
     
@@ -468,18 +470,18 @@ def train_step(sample, model, optimizer, loss_object):
 
 
 @ex.command
-def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh, dr):
+def play(env_name, checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh, dr):
     """
     Play episodes using a trained policy. 
     """
-    env = gym.make('LunarLander-v2')
+    env = gym.make(env_name)
     cmd = Command(dr=dr, dh=dh)
 
     loss_object = torch.nn.CrossEntropyLoss().to(device)
     model = Behavior(hidden_size=hidden_size,state_shape=env.observation_space.shape[0], num_actions=env.action_space.n).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
-    c = load_checkpoint(name=checkpoint_path, train=False, 
+    c = load_checkpoint(path=checkpoint_path, train=False, 
         model=model, optimizer=optimizer, device=device)
 
     for _ in range(play_episodes):
@@ -491,6 +493,9 @@ def play(checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh
 
 @ex.config
 def run_config():    
+    # Environment to train on
+    env_name = 'LunarLander-v2'
+
     train = True # Train or play?
     hidden_size = 32
     epsilon = 0.1
@@ -511,7 +516,7 @@ def run_config():
     eval_every_n_steps = 50_000
     max_return = 300
 
-    experiment_name = f'lunarlander_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_lr{lr}'
+    experiment_name = f'{env_name.replace("-", "_")}_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_lr{lr}'
     checkpoint_path = f'checkpoint_{experiment_name}.pt'
 
 

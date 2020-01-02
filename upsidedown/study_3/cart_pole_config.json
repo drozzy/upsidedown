@@ -1,0 +1,6 @@
+{
+    "env_name" : "CartPole-v1",
+    "eval_every_n_steps": 5000,
+    "dh" : 200,
+    "dr" : 200
+} 
