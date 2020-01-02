@@ -259,10 +259,11 @@ class ReplayBuffer(object):
 
         return Sample(prev_action=prev_action_batch, state=s_batch, dr=dr_batch, dh=dh_batch, action=action_batch)
     
-    def sample_command(self):
+    @ex.capture
+    def sample_command(self, dr, dh):
         # Special case: when there is no experience yet
         if len(self.buffer) == 0:
-            return Command(dr=0, dh=0)
+            return Command(dr=dr, dh=dh)
 
         eps = self.buffer[:self.last_few]
         
