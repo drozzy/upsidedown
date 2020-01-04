@@ -452,17 +452,17 @@ def do_updates(model, optimizer, loss_object, rb, writer, updates, steps, checkp
 @ex.capture
 def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, max_return):
     # Plot a sample dr/dh at this time
-    example_cmd = rb.sample_command()
+    exploration_cmd = rb.sample_command()
 
     # NOW CLEAR the buffer
     rb.clear()
 
-    writer.add_scalar('Exploration/dr', example_cmd.dr, steps)
-    writer.add_scalar('Exploration/dh', example_cmd.dh, steps)
+    writer.add_scalar('Exploration/dr', exploration_cmd.dr, steps)
+    writer.add_scalar('Exploration/dh', exploration_cmd.dh, steps)
 
     # Exploration    
     print("Beggining rollout.")
-    roll = rollout(n_episodes_per_iter, env=env, model=model, cmd=example_cmd,
+    roll = rollout(n_episodes_per_iter, env=env, model=model, cmd=exploration_cmd,
         sample_action=True, replay_buffer=rb, device=device, 
         epsilon=epsilon, max_return=max_return)
     rb.add(roll.trajectories)
