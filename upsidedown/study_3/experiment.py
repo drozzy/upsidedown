@@ -13,7 +13,7 @@ from torch import nn
 from itertools import count
 from torch.utils.tensorboard import SummaryWriter
 from sacred import Experiment
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 
 ex = Experiment()
 
@@ -77,8 +77,12 @@ def rollout_episode(env, model, sample_action, cmd,
         t.add(prev_action, s_old, action, reward, s)    
         prev_action = action    
         ep_reward += reward
-    
-    
+
+        if t.length > 200:
+            # print("PREMATURE STOP")
+            # Arbitrarily stop
+            done = True
+
     return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
@@ -100,7 +104,7 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
                 cmd = replay_buffer.eval_command()
             else:
                 cmd = replay_buffer.sample_command()
-            
+        
         t, reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
                             render=render, device=device, epsilon=epsilon)            
         
@@ -221,7 +225,11 @@ class ReplayBuffer(object):
         
     def add(self, trajectories):
         for trajectory in trajectories:
-            self._add(trajectory)        
+            self._add(trajectory)       
+
+    def clear(self):
+        self.cur_size = 0
+        self.buffer = [] 
             
     def _add(self, trajectory):
         self.buffer.append(trajectory)
@@ -271,7 +279,7 @@ class ReplayBuffer(object):
         
         m = np.mean([e.total_return for e in eps])
         s = np.std([e.total_return for e in eps])
-        
+        # off = min(1/s, s) # To prevent explosion
         dr_0 = np.random.uniform(m, m + s)
         
         return Command(dh=dh_0, dr=dr_0)
@@ -286,6 +294,9 @@ class ReplayBuffer(object):
         return Command(dh=dh_0, dr=dr_0)
 
 
+def swish(x, beta=1):                                                                                                                                                                                      
+    return x * torch.sigmoid(beta * x)
+
 class Behavior(nn.Module):
     @ex.capture
     def __init__(self, hidden_size, state_shape, num_actions, return_scale, horizon_scale):
@@ -299,7 +310,7 @@ class Behavior(nn.Module):
         self.fc_dr = nn.Linear(1, hidden_size)
         self.fc_dh = nn.Linear(1, hidden_size)
         
-        self.fc1 = nn.Linear(hidden_size * 4, hidden_size)
+        self.fc1 = nn.Linear(hidden_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, num_actions)
 
     def forward(self, prev_action, state, dr, dh):
@@ -309,18 +320,19 @@ class Behavior(nn.Module):
         output_dr = torch.sigmoid(self.fc_dr(dr * self.return_scale))
         output_dh = torch.sigmoid(self.fc_dh(dh * self.horizon_scale))
 
-        output = torch.cat([output_prev_action, output_state, output_dr, output_dh], 1)
+        # output = torch.cat([output_dr, output_dh], 1)
+        output = output_prev_action * output_state * output_dr * output_dh
         
         # sum1 = (output_prev_action + output_state)
         # sum2 = (output_dr + output_dh)
         # output = sum1 * sum2 # TODO: Is this a good way to combine these?
         
-        output = torch.relu(self.fc1(output))
+        output = swish(self.fc1(output))
         output = self.fc2(output)
         return output
 
 @ex.command
-def train(env_name, _run, experiment_name, hidden_size, replay_size, last_few, lr, checkpoint_path):
+def train(env_name, _run, experiment_name, hidden_size, lr, checkpoint_path, replay_size, last_few):
     """
     Begin or resume training a policy.
     """
@@ -334,7 +346,7 @@ def train(env_name, _run, experiment_name, hidden_size, replay_size, last_few, l
     model = Behavior(hidden_size=hidden_size, state_shape=env.observation_space.shape[0], num_actions=env.action_space.n).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
-    rb = ReplayBuffer(max_size=replay_size, last_few=last_few)
+    
 
     print("Trying to load:")
     print(checkpoint_path)
@@ -345,23 +357,26 @@ def train(env_name, _run, experiment_name, hidden_size, replay_size, last_few, l
     rewards = []
     done = False
 
+    rb = ReplayBuffer(max_size=replay_size, last_few=last_few)
     while not done:
-        steps, updates, last_eval_step, done = do_iteration(env=env, model=model, optimizer=optimizer, 
-            loss_object=loss_object, rb=rb, writer=writer, updates=updates, steps=steps,
+        steps, updates, last_eval_step, done = do_iteration(env=env, model=model, rb=rb, optimizer=optimizer, 
+            loss_object=loss_object,  writer=writer, updates=updates, steps=steps,
             last_eval_step=last_eval_step, rewards=rewards)
 
     add_artifact()
 
 @ex.capture
-def do_iteration(env, model, optimizer, loss_object, rb, writer, updates, steps, last_eval_step, rewards):
-
+def do_iteration(env, model, optimizer, loss_object, writer, updates, steps, last_eval_step, rewards, rb):
     # Exloration
+    print("Beginning exploration.")
     steps = do_exploration(env, model, rb, writer, steps)
     
     # Updates    
+    print("Beginning updates.")
     updates = do_updates(model, optimizer, loss_object, rb, writer, updates, steps)
         
     # Evaluation
+    print("Beginning evaluation.")
     last_eval_step, done = do_eval(env=env, model=model, rb=rb, writer=writer, steps=steps, 
         rewards=rewards, last_eval_step=last_eval_step)
 
@@ -439,14 +454,19 @@ def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, 
     # Plot a sample dr/dh at this time
     example_cmd = rb.sample_command()
 
+    # NOW CLEAR the buffer
+    rb.clear()
+
     writer.add_scalar('Exploration/dr', example_cmd.dr, steps)
     writer.add_scalar('Exploration/dh', example_cmd.dh, steps)
 
     # Exploration    
-    roll = rollout(n_episodes_per_iter, env=env, model=model, 
+    print("Beggining rollout.")
+    roll = rollout(n_episodes_per_iter, env=env, model=model, cmd=example_cmd,
         sample_action=True, replay_buffer=rb, device=device, 
         epsilon=epsilon, max_return=max_return)
     rb.add(roll.trajectories)
+    print("End rollout.")
 
     steps += roll.length
     
@@ -463,7 +483,7 @@ def train_step(sample, model, optimizer, loss_object):
     optimizer.zero_grad()    
     predictions = model(prev_action=sample.prev_action, state=sample.state, dr=sample.dr, dh=sample.dh)
     loss = loss_object(predictions, sample.action)
-    
+
     loss.backward()
     optimizer.step()
     
@@ -513,7 +533,7 @@ def run_config():
     last_few = 50     
     n_episodes_per_iter = 10
     n_updates_per_iter = 50
-    eval_episodes = 100
+    eval_episodes = 10
     eval_every_n_steps = 50_000
     max_return = 300
 
