@@ -2,8 +2,8 @@ from collections import namedtuple
 import torch.nn.functional as F
 import time 
 import gym
+from gym.wrappers.time_limit import TimeLimit
 from itertools import cycle
-
 import os
 import numpy as np
 import random
@@ -78,15 +78,10 @@ def rollout_episode(env, model, sample_action, cmd,
         prev_action = action    
         ep_reward += reward
 
-        if t.length > 200:
-            # print("PREMATURE STOP")
-            # Arbitrarily stop
-            done = True
-
     return t, ep_reward
 
 def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
-            replay_buffer=None, device=None, evaluation=False, epsilon=0.0, max_return=300):
+            replay_buffer=None, device=None, epsilon=0.0, max_return=300):
     """
     @param model: Model to user to select action. If None selects random action.
     @param cmd: If None will be sampled from the replay buffer.
@@ -94,17 +89,13 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
                                 selects max.
     @param epsilon - Probability of doing a random action. Between 0 and 1.0. Or -1 if no random actions are needed?
     """
+    assert cmd is not None
+
     trajectories = []
     rewards = [] 
     length = 0
-    
+
     for e in range(episodes):
-        if (model is not None) and (cmd is None):
-            if evaluation:
-                cmd = replay_buffer.eval_command()
-            else:
-                cmd = replay_buffer.sample_command()
-        
         t, reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
                             render=render, device=device, epsilon=epsilon)            
         
@@ -331,8 +322,10 @@ class Behavior(nn.Module):
         output = self.fc2(output)
         return output
 
+
+
 @ex.command
-def train(env_name, _run, experiment_name, hidden_size, lr, checkpoint_path, replay_size, last_few):
+def train(env_name, _run, experiment_name, hidden_size, lr, checkpoint_path, replay_size, last_few, max_episode_steps):
     """
     Begin or resume training a policy.
     """
@@ -340,6 +333,9 @@ def train(env_name, _run, experiment_name, hidden_size, lr, checkpoint_path, rep
     log_dir = f'tensorboard/{run_id}_{experiment_name}'
     writer = SummaryWriter(log_dir=log_dir)
     env = gym.make(env_name)
+
+    if max_episode_steps is not None:
+        env = TimeLimit(env, max_episode_steps=max_episode_steps)
     
     loss_object = torch.nn.CrossEntropyLoss().to(device)
     
@@ -385,10 +381,12 @@ def do_iteration(env, model, optimizer, loss_object, writer, updates, steps, las
 @ex.capture
 def do_eval(env, model, rb, writer, steps, rewards, last_eval_step, eval_episodes, 
     max_return, max_steps, solved_min_reward, solved_n_episodes, eval_every_n_steps):
+    
+    eval_cmd = rb.eval_command()
 
     roll = rollout(eval_episodes, env=env, model=model, 
             sample_action=True, replay_buffer=rb, 
-            device=device, evaluation=True,
+            device=device, cmd=eval_cmd,
             max_return=max_return)
 
     steps_exceeded = steps >= max_steps
@@ -491,11 +489,15 @@ def train_step(sample, model, optimizer, loss_object):
 
 
 @ex.command
-def play(env_name, checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh, dr):
+def play(env_name, checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh, dr, max_episode_steps):
     """
     Play episodes using a trained policy. 
     """
     env = gym.make(env_name)
+
+    if max_episode_steps is not None:
+        env = TimeLimit(env, max_episode_steps=max_episode_steps)
+
     cmd = Command(dr=dr, dh=dh)
 
     loss_object = torch.nn.CrossEntropyLoss().to(device)
@@ -516,6 +518,7 @@ def play(env_name, checkpoint_path, epsilon, sample_action, hidden_size, play_ep
 def run_config():    
     # Environment to train on
     env_name = 'LunarLander-v2'
+    max_episode_steps = None # If set, stop the episode after this many steps
 
     train = True # Train or play?
     hidden_size = 32
