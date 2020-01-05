@@ -17,10 +17,10 @@ def study():
                             "dh" : 200,
                             "dr" : 400,
                             "last_few" : 10,
-                            "lr" : 0.005,
+                            "lr" : lr,
                             "replay_size": replay_size,
-                            "n_episodes_per_iter" : 100,
-                            "n_updates_per_iter" : 200,
+                            "n_episodes_per_iter" : n_episodes_per_iter,
+                            "n_updates_per_iter" : n_updates_per_iter,
                             "epsilon" : 0.0
                         })
 
