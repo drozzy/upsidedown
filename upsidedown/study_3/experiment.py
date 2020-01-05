@@ -264,23 +264,20 @@ class ReplayBuffer(object):
         if len(self.buffer) == 0:
             return Command(dr=dr, dh=dh)
 
-        eps = self.buffer[:self.last_few]
+        episodes = self.buffer[:self.last_few]
+        dh_0 = 2 * np.max([e.length for e in episodes])
         
-        dh_0 = np.mean([e.length for e in eps])
-        
-        m = np.mean([e.total_return for e in eps])
-        s = np.std([e.total_return for e in eps])
-        # off = min(1/s, s) # To prevent explosion
-        dr_0 = np.random.uniform(m, m + s)
-        
+        max_return = np.max([e.total_return for e in episodes])
+        dr_0 = (max_return / 2.0) if max_return < 0 else (max_return * 2.0)
+
         return Command(dh=dh_0, dr=dr_0)
 
     def eval_command(self):
-        eps = self.buffer[:self.last_few]
+        episodes = self.buffer[:self.last_few]
         
-        dh_0 = np.mean([e.length for e in eps])
+        dh_0 = np.mean([e.length for e in episodes])
         
-        dr_0 = np.min([e.total_return for e in eps])
+        dr_0 = np.min([e.total_return for e in episodes])
         
         return Command(dh=dh_0, dr=dr_0)
 
