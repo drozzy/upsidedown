@@ -124,7 +124,10 @@ class Rollout(object):
         return np.mean(self.rewards)
 
 @ex.capture
-def get_checkpoint_path(_run, experiment_name):
+def get_checkpoint_path(_run, experiment_name, existing_checkpoint_path):
+    if existing_checkpoint_path is not None:
+        return existing_checkpoint_path
+
     run_id = _run._id or datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     return f'checkpoint_{run_id}_{experiment_name}.pt'
 
@@ -555,6 +558,7 @@ def run_config():
 
     experiment_name = f'{env_name.replace("-", "_")}_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_lr{lr}'
     
+    existing_checkpoint_path = None
 
 
     # Play specific
