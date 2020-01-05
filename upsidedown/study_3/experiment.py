@@ -489,8 +489,8 @@ def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, 
 
     return steps
 
-@ex.capture
-def add_artifact(checkpoint_path):
+def add_artifact():
+    checkpoint_path = get_checkpoint_path()
     ex.add_artifact(checkpoint_path, name='checkpoint.pt')
            
 def train_step(sample, model, optimizer, loss_object):
