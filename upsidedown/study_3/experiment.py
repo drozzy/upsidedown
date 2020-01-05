@@ -273,10 +273,17 @@ class ReplayBuffer(object):
             return Command(dr=dr, dh=dh)
 
         episodes = self.buffer[:self.last_few]
-        dh_0 = 2 * np.max([e.length for e in episodes])
         
-        max_return = np.max([e.total_return for e in episodes])
-        dr_0 = (max_return / 2.0) if max_return < 0 else (max_return * 2.0)
+        # This seems to work for cartpole:
+        # dh_0 = 2 * np.max([e.length for e in episodes])
+        # max_return = np.max([e.total_return for e in episodes])
+        # dr_0 = max(2 * max_return, 1)
+
+        # This seems to work for lunar-lander
+        dh_0 = np.mean([e.length for e in episodes])
+        m = np.mean([e.total_return for e in episodes])
+        s = np.std([e.total_return for e in episodes])        
+        dr_0 = np.random.uniform(m, m + s)
 
         return Command(dh=dh_0, dr=dr_0)
 
