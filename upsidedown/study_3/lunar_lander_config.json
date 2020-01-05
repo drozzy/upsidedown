@@ -7,7 +7,6 @@
     "lr" : 0.005,
     "replay_size": 100,
     "n_episodes_per_iter" : 100,
-    "n_updates_per_iter" : 100,
-    "epsilon" : 0.0,
-    "max_episode_steps" : 200
+    "n_updates_per_iter" : 200,
+    "epsilon" : 0.0
 } 

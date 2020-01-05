@@ -1,14 +1,16 @@
 {
     "env_name" : "CartPole-v1",
     "eval_every_n_steps": 5000,
-    "dh" : 500,
-    "dr" : 500,
+    "dh" : 475,
+    "dr" : 475,
     "last_few" : 10,
     "lr" : 0.005,
     "replay_size": 100,
     "n_episodes_per_iter" : 100,
     "n_updates_per_iter" : 100,
     "epsilon" : 0.0,
-    "sample_action" : "True",
-    "play_episodes": 3
+    "sample_action" : "False",
+    "play_episodes": 3,
+    "solved_min_reward": 475,
+    "solved_n_episodes": 100
 } 
