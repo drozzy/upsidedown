@@ -123,22 +123,30 @@ class Rollout(object):
     def mean_reward(self):
         return np.mean(self.rewards)
 
-def save_checkpoint(path, model, optimizer, loss, updates, steps):
-    
+@ex.capture
+def get_checkpoint_path(_run, experiment_name):
+    run_id = _run._id or datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
+    return f'checkpoint_{run_id}_{experiment_name}.pt'
+
+def save_checkpoint(model, optimizer, loss, updates, steps):    
+    checkpoint_path = get_checkpoint_path()
+
     torch.save({
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
             'updates': updates,
             'steps': steps}, 
-            path)
+            checkpoint_path)
     
-def load_checkpoint(path, model, optimizer, device, train=True):
+def load_checkpoint(model, optimizer, device, train=True):
+    checkpoint_path = get_checkpoint_path()
+
     loss = 0.0    
     steps = 0
     updates = 0
-    if os.path.exists(path):        
-        checkpoint = torch.load(path)
+    if os.path.exists(checkpoint_path):        
+        checkpoint = torch.load(checkpoint_path)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         loss = checkpoint['loss']
@@ -322,12 +330,13 @@ class Behavior(nn.Module):
 
 
 @ex.command
-def train(env_name, _run, experiment_name, hidden_size, lr, checkpoint_path, replay_size, last_few, max_episode_steps):
+def train(env_name, _run, experiment_name, hidden_size, lr, replay_size, last_few, max_episode_steps):
     """
     Begin or resume training a policy.
     """
     run_id = _run._id or datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     log_dir = f'tensorboard/{run_id}_{experiment_name}'
+    checkpoint_path = get_checkpoint_path()
     writer = SummaryWriter(log_dir=log_dir)
     env = gym.make(env_name)
 
@@ -343,7 +352,7 @@ def train(env_name, _run, experiment_name, hidden_size, lr, checkpoint_path, rep
 
     print("Trying to load:")
     print(checkpoint_path)
-    c = load_checkpoint(checkpoint_path, model, optimizer, device, train=True)
+    c = load_checkpoint(model, optimizer, device, train=True)
     updates, steps, loss = c.updates, c.steps, c.loss
 
     last_eval_step = 0
@@ -420,7 +429,7 @@ def do_eval(env, model, rb, writer, steps, rewards, last_eval_step, eval_episode
  
 
 @ex.capture
-def do_updates(model, optimizer, loss_object, rb, writer, updates, steps, checkpoint_path, 
+def do_updates(model, optimizer, loss_object, rb, writer, updates, steps, 
     batch_size, n_updates_per_iter):
     loss_sum = 0
     loss_count = 0
@@ -440,7 +449,7 @@ def do_updates(model, optimizer, loss_object, rb, writer, updates, steps, checkp
     print(f'u: {updates}, s: {steps}, Loss: {avg_loss}')
     writer.add_scalar('Loss/avg_loss', avg_loss, steps)
 
-    save_checkpoint(checkpoint_path, model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
+    save_checkpoint(model=model, optimizer=optimizer, loss=avg_loss, updates=updates, steps=steps)
     return updates
 
 
@@ -486,7 +495,7 @@ def train_step(sample, model, optimizer, loss_object):
 
 
 @ex.command
-def play(env_name, checkpoint_path, epsilon, sample_action, hidden_size, play_episodes, dh, dr, max_episode_steps):
+def play(env_name, epsilon, sample_action, hidden_size, play_episodes, dh, dr, max_episode_steps):
     """
     Play episodes using a trained policy. 
     """
@@ -501,7 +510,7 @@ def play(env_name, checkpoint_path, epsilon, sample_action, hidden_size, play_ep
     model = Behavior(hidden_size=hidden_size,state_shape=env.observation_space.shape[0], num_actions=env.action_space.n).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
-    c = load_checkpoint(path=checkpoint_path, train=False, 
+    c = load_checkpoint(train=False, 
         model=model, optimizer=optimizer, device=device)
 
     for _ in range(play_episodes):
@@ -538,7 +547,7 @@ def run_config():
     max_return = 300
 
     experiment_name = f'{env_name.replace("-", "_")}_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_lr{lr}'
-    checkpoint_path = f'checkpoint_{experiment_name}.pt'
+    
 
 
     # Play specific
