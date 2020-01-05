@@ -12,8 +12,7 @@ def study():
                 for n_episodes_per_iter in [100, 10, 1]:
                     for n_updates_per_iter in [200, 500, 1000]:
                         ex.run(config_updates={
-                            'eval_every_n_steps': 10_000,
-                            'hidden_size': hidden_size,
+                            'eval_every_n_steps': 10_000,                            
                             "env_name" : "LunarLander-v2",
                             "dh" : 200,
                             "dr" : 400,
