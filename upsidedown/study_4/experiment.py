@@ -54,13 +54,10 @@ def rollout_episode(env, model, sample_action, cmd,
     t = Trajectory()
     
     while not done:
-        if model is None:
-            action = env.action_space.sample()
-        else:            
-            with torch.no_grad():
-                model.eval()
-                action = get_action(env, model, prev_action=prev_action, state=s, cmd=cmd, sample_action=sample_action, epsilon=epsilon, device=device)
-                model.train()
+        with torch.no_grad():
+            model.eval()
+            action = get_action(env, model, prev_action=prev_action, state=s, cmd=cmd, sample_action=sample_action, epsilon=epsilon, device=device)
+            model.train()
         
         if render:
             env.render()
@@ -69,10 +66,9 @@ def rollout_episode(env, model, sample_action, cmd,
         s_old = s        
         s, reward, done, info = env.step(action)
         
-        if model is not None:
-            dh = max(cmd.dh - 1, 1)
-            dr = np.clip(cmd.dr - reward, -max_return, max_return)
-            cmd = Command(dr=dr, dh=dh)
+        dh = max(cmd.dh - 1, 1)
+        dr = np.clip(cmd.dr - reward, -max_return, max_return)
+        cmd = Command(dr=dr, dh=dh)
             
         t.add(prev_action, s_old, action, reward, s)    
         prev_action = action    
@@ -80,16 +76,16 @@ def rollout_episode(env, model, sample_action, cmd,
 
     return t, ep_reward
 
-def rollout(episodes, env, epsilon, max_return, model=None, sample_action=True, cmd=None, render=False, 
+def rollout(episodes, env, epsilon, max_return, model, cmd, sample_action=True, render=False, 
             replay_buffer=None, device=None):
     """
-    @param model: Model to user to select action. If None selects random action.
-    @param cmd: If None will be sampled from the replay buffer.
+    @param model: Model to use to select an action.
     @param sample_action=True: If True samples action from distribution, otherwise 
                                 selects max.
     @param epsilon - Probability of doing a random action. Between 0 and 1.0. Or -1 if no random actions are needed?
     """
     assert cmd is not None
+    assert model is not None
 
     trajectories = []
     rewards = [] 
@@ -527,7 +523,7 @@ def play(env_name, sample_action, max_return, hidden_size, play_episodes, dh, dr
         roll = rollout(episodes=1, env=env, epsilon=0.0, max_return=max_return, model=model, sample_action=sample_action, 
                               cmd=cmd, render=True, device=device)
 
-        print(f"Episode Reward: {roll.mean_reward}")
+        print(f"Episode Reward: {roll.mean_reward}, episode length: {roll.length}")
 
 
 @ex.config
