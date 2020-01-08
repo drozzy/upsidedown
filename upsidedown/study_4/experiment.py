@@ -18,20 +18,20 @@ device = torch.device("cpu")
 ex = Experiment()
 
 # Segment from a trajectory (numpy, single elements)
-Segment = namedtuple('Segment', ['prev_action', 'state', 'dr', 'dh', 'action'])
+Segment = namedtuple('Segment', ['prev_action', 'state', 'dr', 'action', 'episode_over'])
 
 # Batch-sized sample from the replay buffer, each element already a torch.tensor on device
-Sample = namedtuple('Sample', ['prev_action', 'state', 'dr', 'dh', 'action'])
+Sample = namedtuple('Sample', ['prev_action', 'state', 'dr', 'action', 'episode_over'])
 
 # Command expressing desired quantities (numpy, single elements) 
-Command = namedtuple('Command', ['dr', 'dh'])
+Command = namedtuple('Command', ['dr', 'episode_over'])
            
 def get_action(env, model, prev_action, state, cmd, sample_action, epsilon, device):
     prev_action = torch.tensor(prev_action).long().unsqueeze(dim=0).to(device)
+    episode_over = torch.tensor(cmd.episode_over).long().unsqueeze(dim=0).to(device)
     dr = torch.tensor([cmd.dr]).float().unsqueeze(dim=0).to(device)
-    dh = torch.tensor([cmd.dh]).float().unsqueeze(dim=0).to(device)
     state = torch.tensor(state).float().unsqueeze(dim=0).to(device)
-    action_logits = model(prev_action=prev_action, state=state, dr=dr, dh=dh)
+    action_logits = model(prev_action=prev_action, state=state, dr=dr, episode_over=episode_over)
     action_probs = torch.softmax(action_logits, axis=-1)
 
     if random.random() < epsilon: # Random action
@@ -66,11 +66,10 @@ def rollout_episode(env, model, sample_action, cmd,
         s_old = s        
         s, reward, done, info = env.step(action)
         
-        dh = max(cmd.dh - 1, 1)
         dr = np.clip(cmd.dr - reward, -max_return, max_return)
-        cmd = Command(dr=dr, dh=dh)
+        cmd = Command(dr=dr, episode_over=cmd.episode_over)
             
-        t.add(prev_action, s_old, action, reward, s)    
+        t.add(prev_action, s_old, action, reward, s, 1 if done else 0)    
         prev_action = action    
         ep_reward += reward
 
@@ -181,8 +180,8 @@ class Trajectory(object):
         self.return_scale = return_scale
         self.horizon_scale = horizon_scale
         
-    def add(self, prev_action, state, action, reward, state_prime):
-        self.trajectory.append((prev_action, state, action, reward, state_prime))
+    def add(self, prev_action, state, action, reward, state_prime, episode_over):
+        self.trajectory.append((prev_action, state, action, reward, state_prime, episode_over))
         if len(self.cum_sum) == 0:
             self.cum_sum.append(reward)
         else:
@@ -200,12 +199,13 @@ class Trajectory(object):
         prev_action = self.trajectory[t1-1][0]
         state = self.trajectory[t1-1][1]
         action = self.trajectory[t1-1][2]
+        episode_over = self.trajectory[t1-1][3]
 
         d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
         
-        d_h = t2 - t1 + 1.0
+        episode_over = 1
 
-        return Segment(prev_action=prev_action, state=state, dr=d_r, dh=d_h, action=action)
+        return Segment(prev_action=prev_action, state=state, dr=d_r, action=action, episode_over=episode_over)
 
 
 class ReplayBuffer(object):
@@ -241,7 +241,7 @@ class ReplayBuffer(object):
         action_batch = []
         s_batch  = []
         dr_batch = []
-        dh_batch = []
+        episode_over_batch = []
 
         for t in trajectories:
             
@@ -249,7 +249,7 @@ class ReplayBuffer(object):
 
             s_batch.append(segment.state)
             dr_batch.append(segment.dr)
-            dh_batch.append(segment.dh)
+            episode_over_batch.append(segment.episode_over)
             prev_action_batch.append(segment.prev_action)
             
             action_batch.append(segment.action)
@@ -258,42 +258,42 @@ class ReplayBuffer(object):
 
         s_batch = torch.tensor(s_batch).float().to(device)
         dr_batch = torch.tensor(dr_batch).unsqueeze(dim=1).to(device)
-        dh_batch = torch.tensor(dh_batch).unsqueeze(dim=1).to(device)
+        episode_over_batch = torch.tensor(episode_over_batch).long().to(device)
         prev_action_batch = torch.tensor(prev_action_batch).long().to(device)
 
         action_batch = torch.tensor(action_batch).to(device)
 
-        return Sample(prev_action=prev_action_batch, state=s_batch, dr=dr_batch, dh=dh_batch, action=action_batch)
+        return Sample(prev_action=prev_action_batch, state=s_batch, dr=dr_batch, action=action_batch, episode_over=episode_over_batch)
     
     @ex.capture
-    def sample_command(self, dr, dh):
+    def sample_command(self, dr, episode_over):
         # Special case: when there is no experience yet
         if len(self.buffer) == 0:
-            return Command(dr=dr, dh=dh)
+            return Command(dr=dr, episode_over=episode_over)
 
         episodes = self.buffer[:self.last_few]
         
         # This seems to work for cartpole:
-        # dh_0 = 2 * np.max([e.length for e in episodes])
         # max_return = np.max([e.total_return for e in episodes])
         # dr_0 = max(2 * max_return, 1)
 
         # This seems to work for lunar-lander
-        dh_0 = np.mean([e.length for e in episodes])
+        # Pick randomly a target flag
+        episode_over = 1
         m = np.mean([e.total_return for e in episodes])
         s = np.std([e.total_return for e in episodes])        
         dr_0 = np.random.uniform(m, m + s)
 
-        return Command(dh=dh_0, dr=dr_0)
+        return Command(episode_over=episode_over, dr=dr_0)
 
     def eval_command(self):
         episodes = self.buffer[:self.last_few]
         
-        dh_0 = np.mean([e.length for e in episodes])
+        episode_over = 1
         
         dr_0 = np.min([e.total_return for e in episodes])
         
-        return Command(dh=dh_0, dr=dr_0)
+        return Command(episode_over=episode_over, dr=dr_0)
 
 
 def swish(x, beta=1):                                                                                                                                                                                      
@@ -307,26 +307,24 @@ class Behavior(nn.Module):
         self.horizon_scale = horizon_scale
         # Extra action representation for "start" of episode action.
         self.emb_prev_action = torch.nn.Embedding(num_embeddings=num_actions+1, embedding_dim=hidden_size)
+        self.emb_episode_over = torch.nn.Embedding(num_embeddings=2, embedding_dim=hidden_size)
         self.fc_state = nn.Linear(state_shape, hidden_size)
         self.fc_attn_scores = nn.Linear(state_shape, state_shape)
         self.fc_dr = nn.Linear(1, hidden_size)
-        self.fc_dh = nn.Linear(1, hidden_size)
         
         self.fc1 = nn.Linear(hidden_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, num_actions)
 
-    def forward(self, prev_action, state, dr, dh):
+    def forward(self, prev_action, state, dr, episode_over):
         output_prev_action = self.emb_prev_action(prev_action)
+        output_episode_over = self.emb_episode_over(episode_over)
         attn_scores = self.fc_attn_scores(state)
         output_state = self.fc_state(torch.softmax(attn_scores, dim=1) * state)
         output_dr = torch.sigmoid(self.fc_dr(dr * self.return_scale))
-        output_dh = torch.sigmoid(self.fc_dh(dh * self.horizon_scale))
 
-        # output = torch.cat([output_dr, output_dh], 1)
-        output = output_prev_action * output_state * output_dr * output_dh
+        output = output_prev_action * output_state * output_dr * output_episode_over
         
         # sum1 = (output_prev_action + output_state)
-        # sum2 = (output_dr + output_dh)
         # output = sum1 * sum2 # TODO: Is this a good way to combine these?
         
         output = swish(self.fc1(output))
@@ -414,7 +412,6 @@ def do_eval(env, model, rb, writer, steps, rewards, last_eval_step, eval_episode
 
     cmd = rb.eval_command()
     writer.add_scalar('Eval/dr', cmd.dr, steps)
-    writer.add_scalar('Eval/dh', cmd.dh, steps)
     
     writer.add_scalar('Eval/reward', roll.mean_reward, steps) 
     writer.add_scalar('Eval/length', roll.mean_length, steps)
@@ -461,14 +458,12 @@ def do_updates(model, optimizer, loss_object, rb, writer, updates, steps,
 
 @ex.capture
 def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, max_return):
-    # Plot a sample dr/dh at this time
     exploration_cmd = rb.sample_command()
 
     # NOW CLEAR the buffer
     rb.clear()
 
     writer.add_scalar('Exploration/dr', exploration_cmd.dr, steps)
-    writer.add_scalar('Exploration/dh', exploration_cmd.dh, steps)
 
     # Exploration    
     print("Beggining rollout.")
@@ -491,7 +486,7 @@ def add_artifact():
            
 def train_step(sample, model, optimizer, loss_object):
     optimizer.zero_grad()    
-    predictions = model(prev_action=sample.prev_action, state=sample.state, dr=sample.dr, dh=sample.dh)
+    predictions = model(prev_action=sample.prev_action, state=sample.state, dr=sample.dr, episode_over=sample.episode_over)
     loss = loss_object(predictions, sample.action)
 
     loss.backward()
@@ -501,7 +496,7 @@ def train_step(sample, model, optimizer, loss_object):
 
 
 @ex.command
-def play(env_name, sample_action, max_return, hidden_size, play_episodes, dh, dr, max_episode_steps):
+def play(env_name, sample_action, max_return, hidden_size, play_episodes, episode_over, dr, max_episode_steps):
     """
     Play episodes using a trained policy. 
     """
@@ -510,7 +505,7 @@ def play(env_name, sample_action, max_return, hidden_size, play_episodes, dh, dr
     if max_episode_steps is not None:
         env = TimeLimit(env, max_episode_steps=max_episode_steps)
 
-    cmd = Command(dr=dr, dh=dh)
+    cmd = Command(dr=dr, episode_over=episode_over)
 
     loss_object = torch.nn.CrossEntropyLoss().to(device)
     model = Behavior(hidden_size=hidden_size,state_shape=env.observation_space.shape[0], num_actions=env.action_space.n).to(device)
@@ -551,8 +546,8 @@ def run_config():
     eval_episodes = 10
     eval_every_n_steps = 50_000
     max_return = 400 # Maximum possible return for this environment (absolute value)
-    dh = 400
     dr = 400
+    episode_over = 1
 
     experiment_name = f'{env_name.replace("-", "_")}_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_lr{lr}'
     

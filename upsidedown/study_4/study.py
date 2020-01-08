@@ -12,7 +12,6 @@ def study():
         ex.run(config_updates={
                 "env_name" : "LunarLander-v2",
                 'eval_every_n_steps': 10_000,                            
-                        "dh" : 400,
                         "dr" : 400,
                         "max_return" : 400,
                         "last_few" : 10,
