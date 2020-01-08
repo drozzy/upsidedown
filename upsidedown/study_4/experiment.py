@@ -71,7 +71,7 @@ def rollout_episode(env, model, sample_action, cmd,
         
         if model is not None:
             dh = max(cmd.dh - 1, 1)
-            dr = np.clip(cmd.dr - reward, a_min=-max_return, a_max=None)
+            dr = np.clip(cmd.dr - reward, -max_return, max_return)
             cmd = Command(dr=dr, dh=dh)
             
         t.add(prev_action, s_old, action, reward, s)    
