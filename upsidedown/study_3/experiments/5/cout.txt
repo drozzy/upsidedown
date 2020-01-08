@@ -1,0 +1,2311 @@
+Trying to load:
+checkpoint_5_LunarLander_v2_hs32_mr300_b1024_rs100_lf10_ne100_nu200_e0.0_lr0.005.pt
+No checkpoint found. Creating new model.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 200, s: 9490, Loss: 1.3835715055465698
+Beginning evaluation.
+Eval Episode Mean Reward: -171.6224835083316
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 400, s: 18885, Loss: 1.3810864686965942
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 600, s: 28320, Loss: 1.3707938194274902
+Beginning evaluation.
+Eval Episode Mean Reward: -142.94922562919194
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 800, s: 37681, Loss: 1.3559986352920532
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 1000, s: 46828, Loss: 1.3359016180038452
+Beginning evaluation.
+Eval Episode Mean Reward: -110.16402441411381
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 1200, s: 56440, Loss: 1.3196570873260498
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 1400, s: 65844, Loss: 1.3201180696487427
+Beginning evaluation.
+Eval Episode Mean Reward: -105.68803135961579
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 1600, s: 75635, Loss: 1.3154760599136353
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 1800, s: 85155, Loss: 1.2993334531784058
+Beginning evaluation.
+Eval Episode Mean Reward: -105.13296809578682
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2000, s: 94989, Loss: 1.2904531955718994
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2200, s: 104689, Loss: 1.2757270336151123
+Beginning evaluation.
+Eval Episode Mean Reward: -106.82044048162622
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2400, s: 114380, Loss: 1.2694587707519531
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2600, s: 123938, Loss: 1.2389675378799438
+Beginning evaluation.
+Eval Episode Mean Reward: -85.7746722931788
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2800, s: 133059, Loss: 1.205176591873169
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 3000, s: 142018, Loss: 1.1668154001235962
+Beginning evaluation.
+Eval Episode Mean Reward: -73.47083289440369
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 3200, s: 151137, Loss: 1.1459161043167114
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 3400, s: 160343, Loss: 1.1048389673233032
+Beginning evaluation.
+Eval Episode Mean Reward: -66.69201060416086
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 3600, s: 169351, Loss: 1.0948383808135986
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 3800, s: 178289, Loss: 1.1171146631240845
+Beginning evaluation.
+Eval Episode Mean Reward: -55.0519488959914
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 4000, s: 187168, Loss: 1.1059082746505737
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 4200, s: 196116, Loss: 1.0795756578445435
+Beginning evaluation.
+Eval Episode Mean Reward: -82.62648243416623
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 4400, s: 205187, Loss: 1.0301388502120972
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 4600, s: 214360, Loss: 0.9913856387138367
+Beginning evaluation.
+Eval Episode Mean Reward: -47.18204967809621
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 4800, s: 223658, Loss: 0.978272020816803
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 5000, s: 234002, Loss: 0.9251667261123657
+Beginning evaluation.
+Eval Episode Mean Reward: -88.41120059684701
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 5200, s: 258757, Loss: 0.814280092716217
+Beginning evaluation.
+Eval Episode Mean Reward: 23.2438917093834
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 5400, s: 276374, Loss: 0.8458299040794373
+Beginning evaluation.
+Eval Episode Mean Reward: 9.487140216155487
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 5600, s: 296311, Loss: 0.8188448548316956
+Beginning evaluation.
+Eval Episode Mean Reward: -9.15978084228984
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 5800, s: 313158, Loss: 0.7989471554756165
+Beginning evaluation.
+Eval Episode Mean Reward: 18.697938972065437
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 6000, s: 332567, Loss: 0.758486807346344
+Beginning evaluation.
+Eval Episode Mean Reward: 2.3238558008364736
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 6200, s: 352565, Loss: 0.7376084327697754
+Beginning evaluation.
+Eval Episode Mean Reward: -3.5978055097191715
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 6400, s: 370008, Loss: 0.7486389875411987
+Beginning evaluation.
+Eval Episode Mean Reward: -15.729610077586747
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 6600, s: 390196, Loss: 0.7044026851654053
+Beginning evaluation.
+Eval Episode Mean Reward: -14.23154992862997
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 6800, s: 413557, Loss: 0.681063175201416
+Beginning evaluation.
+Eval Episode Mean Reward: 20.317514135126157
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 7000, s: 434814, Loss: 0.6815481781959534
+Beginning evaluation.
+Eval Episode Mean Reward: -29.68863686560177
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 7200, s: 454134, Loss: 0.6718311905860901
+Beginning evaluation.
+Eval Episode Mean Reward: -7.001007347960578
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 7400, s: 482168, Loss: 0.6730967164039612
+Beginning evaluation.
+Eval Episode Mean Reward: -19.33753305803957
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 7600, s: 508201, Loss: 0.6532006859779358
+Beginning evaluation.
+Eval Episode Mean Reward: -27.237783271646812
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 7800, s: 540085, Loss: 0.6706472635269165
+Beginning evaluation.
+Eval Episode Mean Reward: -32.61672393495145
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 8000, s: 575832, Loss: 0.6442113518714905
+Beginning evaluation.
+Eval Episode Mean Reward: 18.57125201257255
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 8200, s: 606831, Loss: 0.6341156363487244
+Beginning evaluation.
+Eval Episode Mean Reward: -22.15489094924931
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 8400, s: 634530, Loss: 0.6259040236473083
+Beginning evaluation.
+Eval Episode Mean Reward: 45.073414841421126
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 8600, s: 663390, Loss: 0.6457231640815735
+Beginning evaluation.
+Eval Episode Mean Reward: -4.429564073503428
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 8800, s: 696503, Loss: 0.629700779914856
+Beginning evaluation.
+Eval Episode Mean Reward: 71.8107031827456
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 9000, s: 731855, Loss: 0.5902016162872314
+Beginning evaluation.
+Eval Episode Mean Reward: 32.12863984116399
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 9200, s: 769250, Loss: 0.5835123658180237
+Beginning evaluation.
+Eval Episode Mean Reward: 70.6830606269704
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 9400, s: 798091, Loss: 0.5896996855735779
+Beginning evaluation.
+Eval Episode Mean Reward: 15.323677980493267
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 9600, s: 834973, Loss: 0.5457279086112976
+Beginning evaluation.
+Eval Episode Mean Reward: 0.639976216308672
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 9800, s: 863407, Loss: 0.5703872442245483
+Beginning evaluation.
+Eval Episode Mean Reward: 75.30805417885391
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 10000, s: 887458, Loss: 0.5694729685783386
+Beginning evaluation.
+Eval Episode Mean Reward: 70.65925871352826
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 10200, s: 915889, Loss: 0.5393339395523071
+Beginning evaluation.
+Eval Episode Mean Reward: 58.64860069500262
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 10400, s: 947581, Loss: 0.547513484954834
+Beginning evaluation.
+Eval Episode Mean Reward: 64.27022754423089
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 10600, s: 979684, Loss: 0.5477614998817444
+Beginning evaluation.
+Eval Episode Mean Reward: 16.256672284299828
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 10800, s: 1011740, Loss: 0.5403497815132141
+Beginning evaluation.
+Eval Episode Mean Reward: 77.64500017071327
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 11000, s: 1040221, Loss: 0.5427907705307007
+Beginning evaluation.
+Eval Episode Mean Reward: 96.91919915954993
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 11200, s: 1072750, Loss: 0.52988600730896
+Beginning evaluation.
+Eval Episode Mean Reward: 95.30037083113062
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 11400, s: 1103537, Loss: 0.5542447566986084
+Beginning evaluation.
+Eval Episode Mean Reward: 9.698166830036268
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 11600, s: 1135960, Loss: 0.5301527380943298
+Beginning evaluation.
+Eval Episode Mean Reward: 74.85068658246226
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 11800, s: 1165857, Loss: 0.5522629022598267
+Beginning evaluation.
+Eval Episode Mean Reward: 35.38451026076394
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 12000, s: 1195019, Loss: 0.5356860160827637
+Beginning evaluation.
+Eval Episode Mean Reward: 61.163606763072195
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 12200, s: 1228153, Loss: 0.5084075331687927
+Beginning evaluation.
+Eval Episode Mean Reward: 50.81606400746174
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 12400, s: 1256943, Loss: 0.5188117027282715
+Beginning evaluation.
+Eval Episode Mean Reward: 37.162220252391215
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 12600, s: 1284261, Loss: 0.5359140634536743
+Beginning evaluation.
+Eval Episode Mean Reward: 118.07988526049681
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 12800, s: 1316339, Loss: 0.48688292503356934
+Beginning evaluation.
+Eval Episode Mean Reward: 86.04667551858168
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 13000, s: 1349903, Loss: 0.455226868391037
+Beginning evaluation.
+Eval Episode Mean Reward: 83.77338968578863
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 13200, s: 1377729, Loss: 0.5103906989097595
+Beginning evaluation.
+Eval Episode Mean Reward: 91.6242487139844
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 13400, s: 1412115, Loss: 0.4554077386856079
+Beginning evaluation.
+Eval Episode Mean Reward: 124.67140452550007
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 13600, s: 1443963, Loss: 0.4565628468990326
+Beginning evaluation.
+Eval Episode Mean Reward: 14.15939156178124
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 13800, s: 1473416, Loss: 0.47379109263420105
+Beginning evaluation.
+Eval Episode Mean Reward: 44.31152314803943
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 14000, s: 1503267, Loss: 0.4583966135978699
+Beginning evaluation.
+Eval Episode Mean Reward: 70.42994248455538
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 14200, s: 1534908, Loss: 0.4508061707019806
+Beginning evaluation.
+Eval Episode Mean Reward: 96.3284331812702
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 14400, s: 1565464, Loss: 0.4516390562057495
+Beginning evaluation.
+Eval Episode Mean Reward: -32.34932214185713
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 14600, s: 1599308, Loss: 0.43819659948349
+Beginning evaluation.
+Eval Episode Mean Reward: 35.161440512154044
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 14800, s: 1625628, Loss: 0.4957312047481537
+Beginning evaluation.
+Eval Episode Mean Reward: 48.35113972046823
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 15000, s: 1653497, Loss: 0.4981362521648407
+Beginning evaluation.
+Eval Episode Mean Reward: 89.2218011891172
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 15200, s: 1684254, Loss: 0.46260344982147217
+Beginning evaluation.
+Eval Episode Mean Reward: 56.82092516153665
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 15400, s: 1715552, Loss: 0.45618775486946106
+Beginning evaluation.
+Eval Episode Mean Reward: 110.66797220237223
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 15600, s: 1747582, Loss: 0.43781575560569763
+Beginning evaluation.
+Eval Episode Mean Reward: 70.82337546220097
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 15800, s: 1777511, Loss: 0.4497345983982086
+Beginning evaluation.
+Eval Episode Mean Reward: 95.47963627669256
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 16000, s: 1808378, Loss: 0.43569907546043396
+Beginning evaluation.
+Eval Episode Mean Reward: 78.00073965941674
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 16200, s: 1835809, Loss: 0.42467623949050903
+Beginning evaluation.
+Eval Episode Mean Reward: 138.3825436494917
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 16400, s: 1865595, Loss: 0.432399183511734
+Beginning evaluation.
+Eval Episode Mean Reward: 41.586900342012584
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 16600, s: 1898592, Loss: 0.4246240556240082
+Beginning evaluation.
+Eval Episode Mean Reward: 100.75303777151146
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 16800, s: 1929024, Loss: 0.4260175824165344
+Beginning evaluation.
+Eval Episode Mean Reward: 142.27791630183393
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 17000, s: 1965022, Loss: 0.3819941580295563
+Beginning evaluation.
+Eval Episode Mean Reward: 89.4120117715097
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 17200, s: 1998965, Loss: 0.40972641110420227
+Beginning evaluation.
+Eval Episode Mean Reward: 64.98845798110354
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 17400, s: 2031737, Loss: 0.40980979800224304
+Beginning evaluation.
+Eval Episode Mean Reward: 87.16080655675943
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 17600, s: 2062811, Loss: 0.43213942646980286
+Beginning evaluation.
+Eval Episode Mean Reward: 58.26262556616639
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 17800, s: 2092428, Loss: 0.4291352331638336
+Beginning evaluation.
+Eval Episode Mean Reward: 53.97481442736122
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 18000, s: 2122785, Loss: 0.4336230456829071
+Beginning evaluation.
+Eval Episode Mean Reward: 70.64021344676081
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 18200, s: 2153929, Loss: 0.4292691946029663
+Beginning evaluation.
+Eval Episode Mean Reward: 58.93748038253504
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 18400, s: 2187009, Loss: 0.4235345125198364
+Beginning evaluation.
+Eval Episode Mean Reward: 106.89363443341043
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 18600, s: 2216122, Loss: 0.4476619362831116
+Beginning evaluation.
+Eval Episode Mean Reward: 160.28529186203295
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 18800, s: 2246187, Loss: 0.43471527099609375
+Beginning evaluation.
+Eval Episode Mean Reward: 91.40510633438421
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 19000, s: 2275761, Loss: 0.4150179922580719
+Beginning evaluation.
+Eval Episode Mean Reward: 62.54466410490634
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 19200, s: 2305242, Loss: 0.42652279138565063
+Beginning evaluation.
+Eval Episode Mean Reward: 80.60488674289812
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 19400, s: 2335060, Loss: 0.4235086143016815
+Beginning evaluation.
+Eval Episode Mean Reward: 17.435346338453616
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 19600, s: 2360751, Loss: 0.4409175515174866
+Beginning evaluation.
+Eval Episode Mean Reward: 76.61059512027481
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 19800, s: 2389646, Loss: 0.40408390760421753
+Beginning evaluation.
+Eval Episode Mean Reward: 92.75327127857825
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 20000, s: 2422001, Loss: 0.38874301314353943
+Beginning evaluation.
+Eval Episode Mean Reward: 12.667417571305997
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 20200, s: 2453029, Loss: 0.3633226752281189
+Beginning evaluation.
+Eval Episode Mean Reward: 57.28074441991514
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 20400, s: 2487371, Loss: 0.34886595606803894
+Beginning evaluation.
+Eval Episode Mean Reward: 123.36160293749197
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 20600, s: 2516415, Loss: 0.38281524181365967
+Beginning evaluation.
+Eval Episode Mean Reward: 173.9186537962165
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 20800, s: 2546275, Loss: 0.37724390625953674
+Beginning evaluation.
+Eval Episode Mean Reward: 66.34807861365083
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 21000, s: 2574814, Loss: 0.3670727014541626
+Beginning evaluation.
+Eval Episode Mean Reward: 157.95174151177443
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 21200, s: 2610398, Loss: 0.3335666358470917
+Beginning evaluation.
+Eval Episode Mean Reward: 146.65409767491784
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 21400, s: 2641704, Loss: 0.35953450202941895
+Beginning evaluation.
+Eval Episode Mean Reward: 128.59852114548409
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 21600, s: 2672886, Loss: 0.3472002148628235
+Beginning evaluation.
+Eval Episode Mean Reward: 115.76245577605923
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 21800, s: 2704315, Loss: 0.3508782982826233
+Beginning evaluation.
+Eval Episode Mean Reward: 94.56847670880708
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 22000, s: 2736396, Loss: 0.34562763571739197
+Beginning evaluation.
+Eval Episode Mean Reward: 104.78580006223599
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 22200, s: 2771276, Loss: 0.33019787073135376
+Beginning evaluation.
+Eval Episode Mean Reward: 130.34978751765823
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 22400, s: 2798714, Loss: 0.38907814025878906
+Beginning evaluation.
+Eval Episode Mean Reward: 124.50930775233599
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 22600, s: 2829645, Loss: 0.349785715341568
+Beginning evaluation.
+Eval Episode Mean Reward: 89.05575491600591
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 22800, s: 2861031, Loss: 0.3601513206958771
+Beginning evaluation.
+Eval Episode Mean Reward: 113.00938768074627
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 23000, s: 2891139, Loss: 0.3455533981323242
+Beginning evaluation.
+Eval Episode Mean Reward: 81.83041719123351
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 23200, s: 2923759, Loss: 0.3508186340332031
+Beginning evaluation.
+Eval Episode Mean Reward: 60.261467967766805
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 23400, s: 2951990, Loss: 0.3705371618270874
+Beginning evaluation.
+Eval Episode Mean Reward: 156.88928173567643
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 23600, s: 2979685, Loss: 0.3560841679573059
+Beginning evaluation.
+Eval Episode Mean Reward: 149.59325962025412
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 23800, s: 3006047, Loss: 0.3538692891597748
+Beginning evaluation.
+Eval Episode Mean Reward: 79.83759079332177
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 24000, s: 3036517, Loss: 0.31635382771492004
+Beginning evaluation.
+Eval Episode Mean Reward: 141.16730162405756
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 24200, s: 3065283, Loss: 0.32243528962135315
+Beginning evaluation.
+Eval Episode Mean Reward: 121.25364546577816
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 24400, s: 3093095, Loss: 0.3228590488433838
+Beginning evaluation.
+Eval Episode Mean Reward: 136.41787497668693
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 24600, s: 3121848, Loss: 0.32649993896484375
+Beginning evaluation.
+Eval Episode Mean Reward: 157.43236391480488
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 24800, s: 3150407, Loss: 0.30467426776885986
+Beginning evaluation.
+Eval Episode Mean Reward: 123.52129494299231
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 25000, s: 3178349, Loss: 0.3244319558143616
+Beginning evaluation.
+Eval Episode Mean Reward: 151.59435494086202
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 25200, s: 3208942, Loss: 0.29355525970458984
+Beginning evaluation.
+Eval Episode Mean Reward: 88.57220994301171
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 25400, s: 3240697, Loss: 0.290605753660202
+Beginning evaluation.
+Eval Episode Mean Reward: 131.8462134475099
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 25600, s: 3272230, Loss: 0.29775044322013855
+Beginning evaluation.
+Eval Episode Mean Reward: 128.34681086352157
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 25800, s: 3301658, Loss: 0.3051483929157257
+Beginning evaluation.
+Eval Episode Mean Reward: 38.1212992421765
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 26000, s: 3332814, Loss: 0.30540597438812256
+Beginning evaluation.
+Eval Episode Mean Reward: 26.76185405280562
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 26200, s: 3363980, Loss: 0.3252120912075043
+Beginning evaluation.
+Eval Episode Mean Reward: 200.62330396298407
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 26400, s: 3393985, Loss: 0.32649990916252136
+Beginning evaluation.
+Eval Episode Mean Reward: 204.4655423404414
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 26600, s: 3423650, Loss: 0.3314317762851715
+Beginning evaluation.
+Eval Episode Mean Reward: 215.5139592554343
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 26800, s: 3452852, Loss: 0.33329063653945923
+Beginning evaluation.
+Eval Episode Mean Reward: 132.17900966039028
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 27000, s: 3480379, Loss: 0.3534119427204132
+Beginning evaluation.
+Eval Episode Mean Reward: 133.7073332337664
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 27200, s: 3512730, Loss: 0.3287498950958252
+Beginning evaluation.
+Eval Episode Mean Reward: 87.01127152803333
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 27400, s: 3543859, Loss: 0.31527388095855713
+Beginning evaluation.
+Eval Episode Mean Reward: 120.49831430184054
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 27600, s: 3576140, Loss: 0.30920708179473877
+Beginning evaluation.
+Eval Episode Mean Reward: 112.26415971781796
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 27800, s: 3607591, Loss: 0.3005301356315613
+Beginning evaluation.
+Eval Episode Mean Reward: 80.18868522624055
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 28000, s: 3637224, Loss: 0.32909339666366577
+Beginning evaluation.
+Eval Episode Mean Reward: 165.87523565709805
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 28200, s: 3667903, Loss: 0.3201137185096741
+Beginning evaluation.
+Eval Episode Mean Reward: 107.9516424396613
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 28400, s: 3695460, Loss: 0.32513076066970825
+Beginning evaluation.
+Eval Episode Mean Reward: 165.92186592326058
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 28600, s: 3723961, Loss: 0.3280310332775116
+Beginning evaluation.
+Eval Episode Mean Reward: 152.0199161687555
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 28800, s: 3750631, Loss: 0.3268446624279022
+Beginning evaluation.
+Eval Episode Mean Reward: 126.26135554307538
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 29000, s: 3778742, Loss: 0.34561213850975037
+Beginning evaluation.
+Eval Episode Mean Reward: 151.5930329798796
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 29200, s: 3809267, Loss: 0.3371337950229645
+Beginning evaluation.
+Eval Episode Mean Reward: 177.48789247698903
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 29400, s: 3837145, Loss: 0.32175853848457336
+Beginning evaluation.
+Eval Episode Mean Reward: 154.1794645000416
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 29600, s: 3865167, Loss: 0.324049711227417
+Beginning evaluation.
+Eval Episode Mean Reward: 151.8868303027413
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 29800, s: 3894160, Loss: 0.3171049952507019
+Beginning evaluation.
+Eval Episode Mean Reward: 214.86215953226588
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 30000, s: 3923701, Loss: 0.3328210115432739
+Beginning evaluation.
+Eval Episode Mean Reward: 206.31959993517322
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 30200, s: 3956106, Loss: 0.27158161997795105
+Beginning evaluation.
+Eval Episode Mean Reward: 224.49020053604528
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 30400, s: 3991209, Loss: 0.26975664496421814
+Beginning evaluation.
+Eval Episode Mean Reward: 194.84396079097644
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 30600, s: 4027014, Loss: 0.26884961128234863
+Beginning evaluation.
+Eval Episode Mean Reward: 178.5400791550853
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 30800, s: 4063565, Loss: 0.26966220140457153
+Beginning evaluation.
+Eval Episode Mean Reward: 188.09953744622453
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 31000, s: 4096854, Loss: 0.2949954867362976
+Beginning evaluation.
+Eval Episode Mean Reward: 121.52081538898994
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 31200, s: 4131305, Loss: 0.27364376187324524
+Beginning evaluation.
+Eval Episode Mean Reward: 110.07281644001952
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 31400, s: 4162198, Loss: 0.3030063211917877
+Beginning evaluation.
+Eval Episode Mean Reward: 173.573131594367
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 31600, s: 4195555, Loss: 0.2935625910758972
+Beginning evaluation.
+Eval Episode Mean Reward: 207.17233648814877
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 31800, s: 4230895, Loss: 0.2936720550060272
+Beginning evaluation.
+Eval Episode Mean Reward: 124.29521339808134
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 32000, s: 4268100, Loss: 0.2717258930206299
+Beginning evaluation.
+Eval Episode Mean Reward: 220.00231848650952
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 32200, s: 4303513, Loss: 0.2928396165370941
+Beginning evaluation.
+Eval Episode Mean Reward: 149.1056689423995
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 32400, s: 4338559, Loss: 0.2948993444442749
+Beginning evaluation.
+Eval Episode Mean Reward: 177.88341910946295
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 32600, s: 4370654, Loss: 0.3002149164676666
+Beginning evaluation.
+Eval Episode Mean Reward: 179.3039113369062
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 32800, s: 4403820, Loss: 0.2699899971485138
+Beginning evaluation.
+Eval Episode Mean Reward: 177.36255939786156
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 33000, s: 4437392, Loss: 0.29880642890930176
+Beginning evaluation.
+Eval Episode Mean Reward: 155.36882537605396
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 33200, s: 4470451, Loss: 0.25930845737457275
+Beginning evaluation.
+Eval Episode Mean Reward: 236.5040967081421
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 33400, s: 4508146, Loss: 0.23937366902828217
+Beginning evaluation.
+Eval Episode Mean Reward: 164.08800302620875
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 33600, s: 4540562, Loss: 0.25631260871887207
+Beginning evaluation.
+Eval Episode Mean Reward: 137.65113630940033
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 33800, s: 4573487, Loss: 0.2654525339603424
+Beginning evaluation.
+Eval Episode Mean Reward: 168.4370951405718
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 34000, s: 4602775, Loss: 0.2758518159389496
+Beginning evaluation.
+Eval Episode Mean Reward: 202.07129833088945
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 34200, s: 4635350, Loss: 0.25692853331565857
+Beginning evaluation.
+Eval Episode Mean Reward: 186.6473161487941
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 34400, s: 4667077, Loss: 0.26224225759506226
+Beginning evaluation.
+Eval Episode Mean Reward: 180.6339539865149
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 34600, s: 4698447, Loss: 0.24961437284946442
+Beginning evaluation.
+Eval Episode Mean Reward: 132.80883202803224
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 34800, s: 4734328, Loss: 0.23377420008182526
+Beginning evaluation.
+Eval Episode Mean Reward: 189.33695367638515
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 35000, s: 4763786, Loss: 0.2501857578754425
+Beginning evaluation.
+Eval Episode Mean Reward: 148.61274189666287
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 35200, s: 4794742, Loss: 0.2571850121021271
+Beginning evaluation.
+Eval Episode Mean Reward: 49.61363056662451
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 35400, s: 4829264, Loss: 0.23076385259628296
+Beginning evaluation.
+Eval Episode Mean Reward: 139.72366999773502
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 35600, s: 4859468, Loss: 0.2620353102684021
+Beginning evaluation.
+Eval Episode Mean Reward: 189.21249138017868
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 35800, s: 4894059, Loss: 0.23142215609550476
+Beginning evaluation.
+Eval Episode Mean Reward: 176.59073335612254
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 36000, s: 4928225, Loss: 0.23098576068878174
+Beginning evaluation.
+Eval Episode Mean Reward: 186.16892304080636
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 36200, s: 4962095, Loss: 0.23115450143814087
+Beginning evaluation.
+Eval Episode Mean Reward: 132.1697847631139
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 36400, s: 5000127, Loss: 0.22596943378448486
+Beginning evaluation.
+Eval Episode Mean Reward: 142.16253212864072
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 36600, s: 5035634, Loss: 0.22861747443675995
+Beginning evaluation.
+Eval Episode Mean Reward: 166.25182171169524
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 36800, s: 5066185, Loss: 0.22054769098758698
+Beginning evaluation.
+Eval Episode Mean Reward: 113.82041432293299
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 37000, s: 5100989, Loss: 0.2250436395406723
+Beginning evaluation.
+Eval Episode Mean Reward: 215.49283105329178
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 37200, s: 5137914, Loss: 0.20526260137557983
+Beginning evaluation.
+Eval Episode Mean Reward: 191.84704853155458
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 37400, s: 5174922, Loss: 0.21225574612617493
+Beginning evaluation.
+Eval Episode Mean Reward: 205.02106315665188
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 37600, s: 5209552, Loss: 0.21842508018016815
+Beginning evaluation.
+Eval Episode Mean Reward: 127.46537314903995
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 37800, s: 5249771, Loss: 0.21374940872192383
+Beginning evaluation.
+Eval Episode Mean Reward: 136.53672674736467
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 38000, s: 5287992, Loss: 0.2143654078245163
+Beginning evaluation.
+Eval Episode Mean Reward: 135.9027760565432
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 38200, s: 5322515, Loss: 0.2153969705104828
+Beginning evaluation.
+Eval Episode Mean Reward: 159.4457672488795
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 38400, s: 5357613, Loss: 0.2126665711402893
+Beginning evaluation.
+Eval Episode Mean Reward: 156.24806645031518
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 38600, s: 5391164, Loss: 0.22259588539600372
+Beginning evaluation.
+Eval Episode Mean Reward: 126.30562207063754
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 38800, s: 5427079, Loss: 0.23921920359134674
+Beginning evaluation.
+Eval Episode Mean Reward: 191.15928139741533
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 39000, s: 5463992, Loss: 0.2093154340982437
+Beginning evaluation.
+Eval Episode Mean Reward: 137.38366875508495
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 39200, s: 5499917, Loss: 0.213965505361557
+Beginning evaluation.
+Eval Episode Mean Reward: 90.67802392973286
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 39400, s: 5532521, Loss: 0.23894332349300385
+Beginning evaluation.
+Eval Episode Mean Reward: 160.8400010016113
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 39600, s: 5567515, Loss: 0.2181040644645691
+Beginning evaluation.
+Eval Episode Mean Reward: 189.92614341591434
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 39800, s: 5608660, Loss: 0.20008400082588196
+Beginning evaluation.
+Eval Episode Mean Reward: 154.3562869470959
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 40000, s: 5646844, Loss: 0.21127527952194214
+Beginning evaluation.
+Eval Episode Mean Reward: 168.0416474145805
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 40200, s: 5677419, Loss: 0.22931884229183197
+Beginning evaluation.
+Eval Episode Mean Reward: 192.4492588516706
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 40400, s: 5712467, Loss: 0.2199545055627823
+Beginning evaluation.
+Eval Episode Mean Reward: 156.409422216731
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 40600, s: 5745855, Loss: 0.21061202883720398
+Beginning evaluation.
+Eval Episode Mean Reward: 122.40770197195975
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 40800, s: 5782727, Loss: 0.21276867389678955
+Beginning evaluation.
+Eval Episode Mean Reward: 185.96269695002036
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 41000, s: 5823710, Loss: 0.20274406671524048
+Beginning evaluation.
+Eval Episode Mean Reward: 168.04458177041212
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 41200, s: 5865304, Loss: 0.20065145194530487
+Beginning evaluation.
+Eval Episode Mean Reward: 152.55495804224262
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 41400, s: 5898744, Loss: 0.21726304292678833
+Beginning evaluation.
+Eval Episode Mean Reward: 122.21934719303496
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 41600, s: 5935694, Loss: 0.2008844017982483
+Beginning evaluation.
+Eval Episode Mean Reward: 185.78661601892225
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 41800, s: 5975656, Loss: 0.18629443645477295
+Beginning evaluation.
+Eval Episode Mean Reward: 182.2461503945921
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 42000, s: 6015020, Loss: 0.17584359645843506
+Beginning evaluation.
+Eval Episode Mean Reward: 188.35194458447793
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 42200, s: 6046904, Loss: 0.20140933990478516
+Beginning evaluation.
+Eval Episode Mean Reward: 166.98856268496644
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 42400, s: 6080828, Loss: 0.1956353783607483
+Beginning evaluation.
+Eval Episode Mean Reward: 198.30859740546217
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 42600, s: 6119427, Loss: 0.1848011463880539
+Beginning evaluation.
+Eval Episode Mean Reward: 175.97202284210235
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 42800, s: 6148994, Loss: 0.1977093517780304
+Beginning evaluation.
+Eval Episode Mean Reward: 58.566175377838405
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 43000, s: 6183925, Loss: 0.19197231531143188
+Beginning evaluation.
+Eval Episode Mean Reward: 63.3956624522041
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 43200, s: 6221790, Loss: 0.1874820739030838
+Beginning evaluation.
+Eval Episode Mean Reward: 131.37758221181954
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 43400, s: 6254845, Loss: 0.1973554491996765
+Beginning evaluation.
+Eval Episode Mean Reward: 133.99043712680333
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 43600, s: 6285531, Loss: 0.22052688896656036
+Beginning evaluation.
+Eval Episode Mean Reward: 79.63832114520075
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 43800, s: 6319122, Loss: 0.1965419054031372
+Beginning evaluation.
+Eval Episode Mean Reward: 137.25434741826825
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 44000, s: 6352845, Loss: 0.2021102011203766
+Beginning evaluation.
+Eval Episode Mean Reward: 170.89816234204324
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 44200, s: 6385866, Loss: 0.20894277095794678
+Beginning evaluation.
+Eval Episode Mean Reward: 198.05506987830557
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 44400, s: 6420459, Loss: 0.2078695446252823
+Beginning evaluation.
+Eval Episode Mean Reward: 135.41018542948848
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 44600, s: 6452813, Loss: 0.20415574312210083
+Beginning evaluation.
+Eval Episode Mean Reward: 191.007561977962
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 44800, s: 6484821, Loss: 0.2154582440853119
+Beginning evaluation.
+Eval Episode Mean Reward: 195.15808864649017
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 45000, s: 6516765, Loss: 0.21572233736515045
+Beginning evaluation.
+Eval Episode Mean Reward: 57.06381320383444
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 45200, s: 6548344, Loss: 0.20826904475688934
+Beginning evaluation.
+Eval Episode Mean Reward: 159.7590311976992
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 45400, s: 6585229, Loss: 0.2074345052242279
+Beginning evaluation.
+Eval Episode Mean Reward: 152.40661042802353
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 45600, s: 6615320, Loss: 0.20152127742767334
+Beginning evaluation.
+Eval Episode Mean Reward: 122.78629057292184
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 45800, s: 6648542, Loss: 0.2041616439819336
+Beginning evaluation.
+Eval Episode Mean Reward: 111.80310888941528
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 46000, s: 6685663, Loss: 0.19920064508914948
+Beginning evaluation.
+Eval Episode Mean Reward: 135.66578356196317
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 46200, s: 6717599, Loss: 0.21446731686592102
+Beginning evaluation.
+Eval Episode Mean Reward: 127.11120889563244
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 46400, s: 6752599, Loss: 0.19741854071617126
+Beginning evaluation.
+Eval Episode Mean Reward: 176.81101773348774
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 46600, s: 6788821, Loss: 0.20118747651576996
+Beginning evaluation.
+Eval Episode Mean Reward: 140.4644991289842
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 46800, s: 6823020, Loss: 0.19809192419052124
+Beginning evaluation.
+Eval Episode Mean Reward: 171.19725969552366
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 47000, s: 6857345, Loss: 0.20363366603851318
+Beginning evaluation.
+Eval Episode Mean Reward: 87.08587297371861
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 47200, s: 6888019, Loss: 0.21024847030639648
+Beginning evaluation.
+Eval Episode Mean Reward: 166.35736248939918
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 47400, s: 6921596, Loss: 0.20852980017662048
+Beginning evaluation.
+Eval Episode Mean Reward: 146.07202534433156
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 47600, s: 6951518, Loss: 0.2097359299659729
+Beginning evaluation.
+Eval Episode Mean Reward: 111.56419049459423
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 47800, s: 6986135, Loss: 0.19214917719364166
+Beginning evaluation.
+Eval Episode Mean Reward: 80.33662781354707
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 48000, s: 7020841, Loss: 0.19751159846782684
+Beginning evaluation.
+Eval Episode Mean Reward: 121.08484209740973
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 48200, s: 7054373, Loss: 0.18999551236629486
+Beginning evaluation.
+Eval Episode Mean Reward: 75.57624576727954
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 48400, s: 7087572, Loss: 0.184819757938385
+Beginning evaluation.
+Eval Episode Mean Reward: 136.54859867505698
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 48600, s: 7122611, Loss: 0.17174100875854492
+Beginning evaluation.
+Eval Episode Mean Reward: 156.41088940082102
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 48800, s: 7157491, Loss: 0.18851886689662933
+Beginning evaluation.
+Eval Episode Mean Reward: 153.09421698129628
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 49000, s: 7187707, Loss: 0.1955469697713852
+Beginning evaluation.
+Eval Episode Mean Reward: 69.0032669384328
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 49200, s: 7221033, Loss: 0.1690102517604828
+Beginning evaluation.
+Eval Episode Mean Reward: 151.73899964281367
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 49400, s: 7254639, Loss: 0.17821475863456726
+Beginning evaluation.
+Eval Episode Mean Reward: 126.90882236965004
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 49600, s: 7286157, Loss: 0.18806292116641998
+Beginning evaluation.
+Eval Episode Mean Reward: 142.9786413259127
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 49800, s: 7318921, Loss: 0.16820219159126282
+Beginning evaluation.
+Eval Episode Mean Reward: 112.37740146647415
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 50000, s: 7349524, Loss: 0.1746661514043808
+Beginning evaluation.
+Eval Episode Mean Reward: 145.9233144051052
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 50200, s: 7379655, Loss: 0.1776236891746521
+Beginning evaluation.
+Eval Episode Mean Reward: 67.61109458616275
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 50400, s: 7410529, Loss: 0.1658179610967636
+Beginning evaluation.
+Eval Episode Mean Reward: 169.08958090726782
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 50600, s: 7440059, Loss: 0.1632416844367981
+Beginning evaluation.
+Eval Episode Mean Reward: 74.51650366586128
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 50800, s: 7470867, Loss: 0.16361671686172485
+Beginning evaluation.
+Eval Episode Mean Reward: 174.26550011675778
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 51000, s: 7498997, Loss: 0.1768048256635666
+Beginning evaluation.
+Eval Episode Mean Reward: 102.00956041489545
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 51200, s: 7527745, Loss: 0.16885381937026978
+Beginning evaluation.
+Eval Episode Mean Reward: 56.37127544179468
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 51400, s: 7556439, Loss: 0.18206804990768433
+Beginning evaluation.
+Eval Episode Mean Reward: 53.66139224452017
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 51600, s: 7582572, Loss: 0.20244726538658142
+Beginning evaluation.
+Eval Episode Mean Reward: 95.71682946970171
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 51800, s: 7608614, Loss: 0.175031840801239
+Beginning evaluation.
+Eval Episode Mean Reward: 53.18340001331817
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 52000, s: 7635757, Loss: 0.1849098801612854
+Beginning evaluation.
+Eval Episode Mean Reward: 167.9488058403862
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 52200, s: 7665015, Loss: 0.16912563145160675
+Beginning evaluation.
+Eval Episode Mean Reward: 115.57080139722014
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 52400, s: 7692179, Loss: 0.17059770226478577
+Beginning evaluation.
+Eval Episode Mean Reward: 54.28386385233747
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 52600, s: 7719767, Loss: 0.15921689569950104
+Beginning evaluation.
+Eval Episode Mean Reward: 133.3795437328491
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 52800, s: 7748266, Loss: 0.15862630307674408
+Beginning evaluation.
+Eval Episode Mean Reward: -13.367932905346464
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 53000, s: 7777566, Loss: 0.16167204082012177
+Beginning evaluation.
+Eval Episode Mean Reward: 132.56844277623296
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 53200, s: 7806520, Loss: 0.1571064591407776
+Beginning evaluation.
+Eval Episode Mean Reward: -19.382264644630173
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 53400, s: 7836098, Loss: 0.15000160038471222
+Beginning evaluation.
+Eval Episode Mean Reward: 154.188104416086
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 53600, s: 7863438, Loss: 0.1605677753686905
+Beginning evaluation.
+Eval Episode Mean Reward: 197.22217150148262
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 53800, s: 7894537, Loss: 0.15329846739768982
+Beginning evaluation.
+Eval Episode Mean Reward: 128.93014249639592
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 54000, s: 7927407, Loss: 0.14942903816699982
+Beginning evaluation.
+Eval Episode Mean Reward: 118.59237262868164
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 54200, s: 7956267, Loss: 0.17999267578125
+Beginning evaluation.
+Eval Episode Mean Reward: 182.17137360330148
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 54400, s: 7987077, Loss: 0.16070380806922913
+Beginning evaluation.
+Eval Episode Mean Reward: 180.39617407003092
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 54600, s: 8021833, Loss: 0.1498233824968338
+Beginning evaluation.
+Eval Episode Mean Reward: 147.16831590413244
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 54800, s: 8057604, Loss: 0.14884312450885773
+Beginning evaluation.
+Eval Episode Mean Reward: 146.83687524743954
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 55000, s: 8092408, Loss: 0.15473198890686035
+Beginning evaluation.
+Eval Episode Mean Reward: 55.81361366909599
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 55200, s: 8123132, Loss: 0.16161857545375824
+Beginning evaluation.
+Eval Episode Mean Reward: 186.3141016214757
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 55400, s: 8157444, Loss: 0.15693750977516174
+Beginning evaluation.
+Eval Episode Mean Reward: 129.14310912025627
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 55600, s: 8194821, Loss: 0.16264110803604126
+Beginning evaluation.
+Eval Episode Mean Reward: 169.0754847610648
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 55800, s: 8227922, Loss: 0.15610450506210327
+Beginning evaluation.
+Eval Episode Mean Reward: 118.38698013713363
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 56000, s: 8266787, Loss: 0.15326924622058868
+Beginning evaluation.
+Eval Episode Mean Reward: 124.67325471080092
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 56200, s: 8303604, Loss: 0.16234350204467773
+Beginning evaluation.
+Eval Episode Mean Reward: 80.60492740929647
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 56400, s: 8341304, Loss: 0.15688639879226685
+Beginning evaluation.
+Eval Episode Mean Reward: 117.83144605931523
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 56600, s: 8377630, Loss: 0.14725209772586823
+Beginning evaluation.
+Eval Episode Mean Reward: 162.63146519431
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 56800, s: 8414154, Loss: 0.15139243006706238
+Beginning evaluation.
+Eval Episode Mean Reward: 197.09552555592447
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 57000, s: 8451529, Loss: 0.14559514820575714
+Beginning evaluation.
+Eval Episode Mean Reward: 209.62210138597453
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 57200, s: 8492413, Loss: 0.14499880373477936
+Beginning evaluation.
+Eval Episode Mean Reward: 213.38040535406634
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 57400, s: 8526782, Loss: 0.15810681879520416
+Beginning evaluation.
+Eval Episode Mean Reward: 167.67317421014553
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 57600, s: 8560154, Loss: 0.16305038332939148
+Beginning evaluation.
+Eval Episode Mean Reward: 122.83153155686429
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 57800, s: 8595327, Loss: 0.16859838366508484
+Beginning evaluation.
+Eval Episode Mean Reward: 174.71104033698734
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 58000, s: 8638796, Loss: 0.14602595567703247
+Beginning evaluation.
+Eval Episode Mean Reward: 145.355687560922
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 58200, s: 8674299, Loss: 0.15727172791957855
+Beginning evaluation.
+Eval Episode Mean Reward: 173.46517576879717
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 58400, s: 8707022, Loss: 0.16441555321216583
+Beginning evaluation.
+Eval Episode Mean Reward: 107.28175726151608
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 58600, s: 8742904, Loss: 0.16247524321079254
+Beginning evaluation.
+Eval Episode Mean Reward: 109.08147435299483
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 58800, s: 8780860, Loss: 0.15572890639305115
+Beginning evaluation.
+Eval Episode Mean Reward: 140.62429784105512
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 59000, s: 8814382, Loss: 0.14510108530521393
+Beginning evaluation.
+Eval Episode Mean Reward: 155.9180877397183
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 59200, s: 8848834, Loss: 0.15040703117847443
+Beginning evaluation.
+Eval Episode Mean Reward: 105.14037403771344
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 59400, s: 8884975, Loss: 0.1343560814857483
+Beginning evaluation.
+Eval Episode Mean Reward: 82.86892268257552
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 59600, s: 8920125, Loss: 0.13392223417758942
+Beginning evaluation.
+Eval Episode Mean Reward: 63.698960824984816
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 59800, s: 8956200, Loss: 0.13052624464035034
+Beginning evaluation.
+Eval Episode Mean Reward: 166.73046844081054
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 60000, s: 8991511, Loss: 0.13779370486736298
+Beginning evaluation.
+Eval Episode Mean Reward: 113.99851545101338
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 60200, s: 9031443, Loss: 0.1267278790473938
+Beginning evaluation.
+Eval Episode Mean Reward: 137.13407759663278
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 60400, s: 9069288, Loss: 0.12723475694656372
+Beginning evaluation.
+Eval Episode Mean Reward: 93.04501036892019
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 60600, s: 9107279, Loss: 0.12056440114974976
+Beginning evaluation.
+Eval Episode Mean Reward: 164.85874977302424
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 60800, s: 9142344, Loss: 0.13452571630477905
+Beginning evaluation.
+Eval Episode Mean Reward: 211.16048702709946
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 61000, s: 9176700, Loss: 0.13912133872509003
+Beginning evaluation.
+Eval Episode Mean Reward: 179.34182104941354
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 61200, s: 9211519, Loss: 0.1341332346200943
+Beginning evaluation.
+Eval Episode Mean Reward: 129.42403714021026
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 61400, s: 9246199, Loss: 0.13822972774505615
+Beginning evaluation.
+Eval Episode Mean Reward: 90.89663304401563
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 61600, s: 9282002, Loss: 0.14476193487644196
+Beginning evaluation.
+Eval Episode Mean Reward: 179.9914133102318
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 61800, s: 9317413, Loss: 0.13823214173316956
+Beginning evaluation.
+Eval Episode Mean Reward: 153.86183741827693
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 62000, s: 9354814, Loss: 0.12785173952579498
+Beginning evaluation.
+Eval Episode Mean Reward: 181.65153853386033
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 62200, s: 9384948, Loss: 0.1426791548728943
+Beginning evaluation.
+Eval Episode Mean Reward: 126.92916570126161
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 62400, s: 9417276, Loss: 0.14033305644989014
+Beginning evaluation.
+Eval Episode Mean Reward: 32.72903706510942
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 62600, s: 9448955, Loss: 0.13468307256698608
+Beginning evaluation.
+Eval Episode Mean Reward: 107.97322966203708
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 62800, s: 9484871, Loss: 0.1301032304763794
+Beginning evaluation.
+Eval Episode Mean Reward: 93.21524824707554
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 63000, s: 9516999, Loss: 0.1383242905139923
+Beginning evaluation.
+Eval Episode Mean Reward: 23.17275435513663
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 63200, s: 9549254, Loss: 0.1379922777414322
+Beginning evaluation.
+Eval Episode Mean Reward: 91.87085032311874
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 63400, s: 9580654, Loss: 0.1276513934135437
+Beginning evaluation.
+Eval Episode Mean Reward: 137.145606105171
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 63600, s: 9613715, Loss: 0.13299643993377686
+Beginning evaluation.
+Eval Episode Mean Reward: 118.57177349039303
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 63800, s: 9644056, Loss: 0.13226470351219177
+Beginning evaluation.
+Eval Episode Mean Reward: 144.66156341442436
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 64000, s: 9673978, Loss: 0.13684959709644318
+Beginning evaluation.
+Eval Episode Mean Reward: 106.62161419893353
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 64200, s: 9704549, Loss: 0.1388458013534546
+Beginning evaluation.
+Eval Episode Mean Reward: 29.294020253563264
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 64400, s: 9734368, Loss: 0.14038148522377014
+Beginning evaluation.
+Eval Episode Mean Reward: -1.271899279025139
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 64600, s: 9764350, Loss: 0.14738094806671143
+Beginning evaluation.
+Eval Episode Mean Reward: 131.71916760661028
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 64800, s: 9793054, Loss: 0.15273891389369965
+Beginning evaluation.
+Eval Episode Mean Reward: 47.48382813639195
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 65000, s: 9825339, Loss: 0.1334351748228073
+Beginning evaluation.
+Eval Episode Mean Reward: 101.83253192374848
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 65200, s: 9858356, Loss: 0.1370401233434677
+Beginning evaluation.
+Eval Episode Mean Reward: 115.26305825367481
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 65400, s: 9892494, Loss: 0.145783469080925
+Beginning evaluation.
+Eval Episode Mean Reward: 113.1352699621074
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 65600, s: 9924439, Loss: 0.14307282865047455
+Beginning evaluation.
+Eval Episode Mean Reward: 106.74389480564818
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 65800, s: 9956183, Loss: 0.13802066445350647
+Beginning evaluation.
+Eval Episode Mean Reward: 142.95520403544617
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 66000, s: 9990165, Loss: 0.12891384959220886
+Beginning evaluation.
+Eval Episode Mean Reward: 111.41219581448195
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 66200, s: 10023248, Loss: 0.12907545268535614
+Beginning evaluation.
+Steps 10023248 exceeds max env steps 10000000.
+Eval Episode Mean Reward: 148.4686371516217
+WARNING: Logging before flag parsing goes to stderr.
+I0105 22:30:17.498882 15660 run.py:243] Completed after 2:42:17
