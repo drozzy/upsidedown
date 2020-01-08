@@ -45,7 +45,7 @@ def get_action(env, model, prev_action, state, cmd, sample_action, epsilon, devi
     return action
 
 def rollout_episode(env, model, sample_action, cmd, 
-                    render, device, epsilon, max_return=300):
+                    render, device, epsilon, max_return):
     s = env.reset()
     done = False
     ep_reward = 0.0
@@ -71,7 +71,7 @@ def rollout_episode(env, model, sample_action, cmd,
         
         if model is not None:
             dh = max(cmd.dh - 1, 1)
-            dr = min(cmd.dr - reward, max_return)
+            dr = np.clip(cmd.dr - reward, -max_return, max_return)
             cmd = Command(dr=dr, dh=dh)
             
         t.add(prev_action, s_old, action, reward, s)    
@@ -80,8 +80,8 @@ def rollout_episode(env, model, sample_action, cmd,
 
     return t, ep_reward
 
-def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=False, 
-            replay_buffer=None, device=None, epsilon=0.0, max_return=300):
+def rollout(episodes, env, epsilon, max_return, model=None, sample_action=True, cmd=None, render=False, 
+            replay_buffer=None, device=None):
     """
     @param model: Model to user to select action. If None selects random action.
     @param cmd: If None will be sampled from the replay buffer.
@@ -97,7 +97,7 @@ def rollout(episodes, env, model=None, sample_action=True, cmd=None, render=Fals
 
     for e in range(episodes):
         t, reward = rollout_episode(env=env, model=model, sample_action=sample_action, cmd=cmd,
-                            render=render, device=device, epsilon=epsilon)            
+                            render=render, device=device, epsilon=epsilon, max_return=max_return)            
         
         trajectories.append(t)
         length += t.length
@@ -400,7 +400,7 @@ def do_eval(env, model, rb, writer, steps, rewards, last_eval_step, eval_episode
     
     eval_cmd = rb.eval_command()
 
-    roll = rollout(eval_episodes, env=env, model=model, 
+    roll = rollout(eval_episodes, env=env, model=model, epsilon=0.0,
             sample_action=True, replay_buffer=rb, 
             device=device, cmd=eval_cmd,
             max_return=max_return)
@@ -505,7 +505,7 @@ def train_step(sample, model, optimizer, loss_object):
 
 
 @ex.command
-def play(env_name, epsilon, sample_action, hidden_size, play_episodes, dh, dr, max_episode_steps):
+def play(env_name, sample_action, max_return, hidden_size, play_episodes, dh, dr, max_episode_steps):
     """
     Play episodes using a trained policy. 
     """
@@ -524,7 +524,7 @@ def play(env_name, epsilon, sample_action, hidden_size, play_episodes, dh, dr, m
         model=model, optimizer=optimizer, device=device)
 
     for _ in range(play_episodes):
-        roll = rollout(episodes=1, env=env, model=model, sample_action=sample_action, 
+        roll = rollout(episodes=1, env=env, epsilon=0.0, max_return=max_return, model=model, sample_action=sample_action, 
                               cmd=cmd, render=True, device=device)
 
         print(f"Episode Reward: {roll.mean_reward}")
