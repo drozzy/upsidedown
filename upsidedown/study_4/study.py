@@ -20,7 +20,7 @@ def study():
                         "replay_size": 100,
                         "n_episodes_per_iter" : 100,
                         "n_updates_per_iter" : 200,
-                        "epsilon" : 0.001
+                        "epsilon" : 0.0
                     })
 
 if __name__ == '__main__':
