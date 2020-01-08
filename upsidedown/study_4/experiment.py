@@ -554,7 +554,9 @@ def run_config():
     n_updates_per_iter = 50
     eval_episodes = 10
     eval_every_n_steps = 50_000
-    max_return = 300
+    max_return = 400 # Maximum possible return for this environment (absolute value)
+    dh = 400
+    dr = 400
 
     experiment_name = f'{env_name.replace("-", "_")}_hs{hidden_size}_mr{max_return}_b{batch_size}_rs{replay_size}_lf{last_few}_ne{n_episodes_per_iter}_nu{n_updates_per_iter}_e{epsilon}_lr{lr}'
     
@@ -564,8 +566,6 @@ def run_config():
     # Play specific
     sample_action = True
     play_episodes = 5
-    dh = 200
-    dr = 400
 
 
 
