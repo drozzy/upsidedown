@@ -69,7 +69,7 @@ def rollout_episode(env, model, sample_action, cmd,
         dr = np.clip(cmd.dr - reward, -max_return, max_return)
         cmd = Command(dr=dr, episode_over=cmd.episode_over)
             
-        t.add(prev_action, s_old, action, reward, s, 1 if done else 0)    
+        t.add(prev_action, s_old, action, reward, s)
         prev_action = action    
         ep_reward += reward
 
@@ -180,8 +180,8 @@ class Trajectory(object):
         self.return_scale = return_scale
         self.horizon_scale = horizon_scale
         
-    def add(self, prev_action, state, action, reward, state_prime, episode_over):
-        self.trajectory.append((prev_action, state, action, reward, state_prime, episode_over))
+    def add(self, prev_action, state, action, reward, state_prime):
+        self.trajectory.append((prev_action, state, action, reward, state_prime))
         if len(self.cum_sum) == 0:
             self.cum_sum.append(reward)
         else:
@@ -200,14 +200,10 @@ class Trajectory(object):
         prev_action = self.trajectory[t1-1][0]
         state = self.trajectory[t1-1][1]
         action = self.trajectory[t1-1][2]
-        episode_over = self.trajectory[t1-1][5]
-
-        d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
-        
         episode_over = 1 if (t2 == T) else 0
+        d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
 
         return Segment(prev_action=prev_action, state=state, dr=d_r, action=action, episode_over=episode_over)
-
 
 class ReplayBuffer(object):
     
