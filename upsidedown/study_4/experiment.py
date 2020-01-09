@@ -194,16 +194,17 @@ class Trajectory(object):
 
         t1 = random.randint(1, T)
         # t1 = int(random.random() * (T+1)) # THIS IS FASTER by about 1/4
-        t2 = T #random.randint(t1, T)
+        # t2 = T #random.randint(t1, T)
+        t2 = random.randint(t1, T)
         
         prev_action = self.trajectory[t1-1][0]
         state = self.trajectory[t1-1][1]
         action = self.trajectory[t1-1][2]
-        episode_over = self.trajectory[t1-1][3]
+        episode_over = self.trajectory[t1-1][5]
 
         d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
         
-        episode_over = 1
+        episode_over = 1 if (t2 == T) else 0
 
         return Segment(prev_action=prev_action, state=state, dr=d_r, action=action, episode_over=episode_over)
 
