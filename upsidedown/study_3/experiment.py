@@ -238,7 +238,18 @@ class ReplayBuffer(object):
         
         self.buffer = sorted(self.buffer, key=lambda x: x.total_return, reverse=True)
         self.buffer = self.buffer[:self.max_size]
-    
+
+    @property
+    def stats(self):
+        episodes = self.buffer[:self.last_few]
+
+        mean_last = np.mean([e.total_return for e in episodes])
+        std_last =  np.std([e.total_return for e in episodes])
+
+        mean = np.mean([e.total_return for e in self.buffer])
+        std =  np.std([e.total_return for e in self.buffer])        
+        return mean, std, mean_last, std_last
+
     def sample(self, batch_size, device):
         trajectories = np.random.choice(self.buffer, batch_size, replace=True)
         prev_action_batch = []
@@ -465,7 +476,15 @@ def do_updates(model, optimizer, loss_object, rb, writer, updates, steps,
 
 @ex.capture
 def do_exploration(env, model, rb, writer, steps, n_episodes_per_iter, epsilon, max_return):
-    # Plot a sample dr/dh at this time
+    # Plot mean and std of the replay buffer
+    mean, std, mean_last, std_last = rb.stats
+    
+    writer.add_scalar('Buffer/mean', mean, steps)    
+    writer.add_scalar('Buffer/std', std, steps)    
+    writer.add_scalar('Buffer/mean_last_few', mean_last, steps)    
+    writer.add_scalar('Buffer/std_last_few', std_last, steps)    
+
+    # Sample command for the exploration
     exploration_cmd = rb.sample_command()
 
     # NOW CLEAR the buffer
