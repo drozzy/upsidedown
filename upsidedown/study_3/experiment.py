@@ -177,13 +177,11 @@ class Checkpoint(object):
 
 class Trajectory(object):
     
-    def __init__(self, horizon_scale=0.0001, return_scale=0.0001):
+    def __init__(self):
         self.trajectory = []
         self.cum_sum = []
         self.total_return = 0
         self.length = 0
-        self.return_scale = return_scale
-        self.horizon_scale = horizon_scale
         
     def add(self, prev_action, state, action, reward, state_prime):
         self.trajectory.append((prev_action, state, action, reward, state_prime))
