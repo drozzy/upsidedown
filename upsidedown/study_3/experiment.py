@@ -557,7 +557,7 @@ def run_config():
     hidden_size = 32
     epsilon = 0.1
     return_scale = 0.01
-    horizon_scale = 0.01
+    horizon_scale = 0.001
 
     # Train specific
     lr = 0.005
