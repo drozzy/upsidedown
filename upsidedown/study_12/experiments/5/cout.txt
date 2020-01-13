@@ -314,3 +314,82 @@ End rollout.
 Beginning updates.
 u: 2450, s: 101702, Loss: 0.776886522769928
 Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2500, s: 104173, Loss: 0.7636631727218628
+Beginning evaluation.
+Eval Episode Mean Reward: -0.7451284354852575
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2550, s: 106648, Loss: 0.7565324306488037
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2600, s: 109168, Loss: 0.7614004015922546
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2650, s: 113421, Loss: 0.7828830480575562
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2700, s: 115931, Loss: 0.7327640056610107
+Beginning evaluation.
+Eval Episode Mean Reward: -15.69167706195178
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2750, s: 118219, Loss: 0.716920018196106
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2800, s: 121371, Loss: 0.7045421600341797
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2850, s: 123818, Loss: 0.7318544983863831
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2900, s: 127088, Loss: 0.7295230627059937
+Beginning evaluation.
+Eval Episode Mean Reward: -11.637299341038979
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 2950, s: 129482, Loss: 0.6433844566345215
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 3000, s: 131984, Loss: 0.6416942477226257
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
+u: 3050, s: 134572, Loss: 0.6828122735023499
+Beginning evaluation.
+Beginning exploration.
+Beggining rollout.
+End rollout.
+Beginning updates.
