@@ -1,0 +1,78 @@
+{
+  "artifacts": [],
+  "command": "main",
+  "experiment": {
+    "base_dir": "C:\\Users\\Andriy\\Projects\\upsidedown\\upsidedown\\study_12",
+    "dependencies": [
+      "gym==0.15.4",
+      "numpy==1.17.4",
+      "sacred==0.8.1",
+      "torch==1.3.1"
+    ],
+    "mainfile": "experiment.py",
+    "name": "experiment",
+    "repositories": [
+      {
+        "commit": "4415622d6958ab41caf5858962b03912f7bfc841",
+        "dirty": true,
+        "url": "git@github.com:drozzy/upsidedown.git"
+      }
+    ],
+    "sources": [
+      [
+        "experiment.py",
+        "_sources\\experiment_ee7ac7b4755afb9b5dbf1cc6360f7591.py"
+      ]
+    ]
+  },
+  "heartbeat": "2020-01-13T17:33:00.392808",
+  "host": {
+    "ENV": {},
+    "cpu": "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
+    "gpus": {
+      "driver_version": "432.00",
+      "gpus": [
+        {
+          "model": "GeForce RTX 2070",
+          "persistence_mode": false,
+          "total_memory": 8192
+        }
+      ]
+    },
+    "hostname": "Whitebox",
+    "os": [
+      "Windows",
+      "Windows-10-10.0.17763-SP0"
+    ],
+    "python_version": "3.7.3"
+  },
+  "meta": {
+    "command": "main",
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false
+    }
+  },
+  "resources": [],
+  "result": null,
+  "start_time": "2020-01-13T15:32:24.843611",
+  "status": "INTERRUPTED",
+  "stop_time": "2020-01-13T17:33:00.393853"
+}
