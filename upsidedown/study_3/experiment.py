@@ -544,7 +544,7 @@ def play(env_name, epsilon, sample_action, hidden_size, play_episodes, dh, dr, m
         roll = rollout(episodes=1, env=env, model=model, sample_action=sample_action, 
                               cmd=cmd, render=True, device=device)
 
-        print(f"Episode Reward: {roll.mean_reward}")
+        print(f"Episode Reward: {roll.mean_reward} Steps: {roll.length}")
 
 
 @ex.config
