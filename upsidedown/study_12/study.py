@@ -16,9 +16,9 @@ def study():
                 "dr" : 400,
                 "last_few" : 10,
                 "lr" : 0.001,
-                "replay_size": 20,
-                "n_episodes_per_iter" : 20,
-                "n_updates_per_iter" : 50,
+                "replay_size": 40,
+                "n_episodes_per_iter" : 40,
+                "n_updates_per_iter" : 100,
                 "epsilon" : 0.0
             })
 

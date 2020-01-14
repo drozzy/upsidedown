@@ -1,5 +1,7 @@
 {
-  "artifacts": [],
+  "artifacts": [
+    "checkpoint.pt"
+  ],
   "command": "main",
   "experiment": {
     "base_dir": "C:\\Users\\Andriy\\Projects\\upsidedown\\upsidedown\\study_12",
@@ -13,7 +15,7 @@
     "name": "experiment",
     "repositories": [
       {
-        "commit": "4415622d6958ab41caf5858962b03912f7bfc841",
+        "commit": "1eeef234011f03e5135c852c7e0d22984da41d3c",
         "dirty": true,
         "url": "git@github.com:drozzy/upsidedown.git"
       }
@@ -25,7 +27,7 @@
       ]
     ]
   },
-  "heartbeat": "2020-01-14T00:55:38.263387",
+  "heartbeat": "2020-01-14T10:43:27.204779",
   "host": {
     "ENV": {},
     "cpu": "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
@@ -72,7 +74,7 @@
   },
   "resources": [],
   "result": null,
-  "start_time": "2020-01-13T17:33:04.179936",
-  "status": "INTERRUPTED",
-  "stop_time": "2020-01-14T00:55:38.266387"
+  "start_time": "2020-01-14T00:55:45.122867",
+  "status": "COMPLETED",
+  "stop_time": "2020-01-14T10:43:27.204779"
 }
