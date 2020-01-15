@@ -1,5 +1,7 @@
 {
-  "artifacts": [],
+  "artifacts": [
+    "checkpoint.pt"
+  ],
   "command": "main",
   "experiment": {
     "base_dir": "C:\\Users\\Andriy\\Projects\\upsidedown\\upsidedown\\study_12",
@@ -25,7 +27,7 @@
       ]
     ]
   },
-  "heartbeat": "2020-01-14T12:14:16.312354",
+  "heartbeat": "2020-01-14T21:19:48.644589",
   "host": {
     "ENV": {},
     "cpu": "Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz",
@@ -73,5 +75,6 @@
   "resources": [],
   "result": null,
   "start_time": "2020-01-14T10:43:28.816602",
-  "status": "RUNNING"
+  "status": "COMPLETED",
+  "stop_time": "2020-01-14T21:19:48.644589"
 }

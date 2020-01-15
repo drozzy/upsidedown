@@ -14,7 +14,7 @@ def study():
                 'eval_every_n_steps': 10_000,                            
                 "dh" : 400,
                 "dr" : 400,
-                "last_few" : 10,
+                "last_few" : 40,
                 "lr" : 0.001,
                 "replay_size": 40,
                 "n_episodes_per_iter" : 40,
