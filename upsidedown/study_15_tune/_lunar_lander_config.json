@@ -1,0 +1,12 @@
+{
+    "env_name" : "LunarLander-v2",
+    "eval_every_n_steps": 5000,
+    "dh" : 400,
+    "dr" : 400,
+    "last_few" : 10,
+    "lr" : 0.005,
+    "replay_size": 100,
+    "n_episodes_per_iter" : 100,
+    "n_updates_per_iter" : 200,
+    "epsilon" : 0.0
+} 
