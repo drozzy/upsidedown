@@ -27,3 +27,4 @@ dependencies:
     - tensorflow-probability
     - plac
     - atari-py
+    - ray[tune]==0.8.0
