@@ -173,7 +173,7 @@ class LunarLanderTrainable(Trainable):
             
             if model is not None:
                 dh = max(cmd.dh - 1, 1)
-                dr = min(cmd.dr - reward, max_return)
+                dr = min(cmd.dr - reward, self.max_return)
                 cmd = Command(dr=dr, dh=dh)
                 
             t.add(prev_action, s_old, action, reward, s)    
@@ -232,7 +232,7 @@ class LunarLanderTrainable(Trainable):
             'epsilon' : 0.0,
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
-            'lr' = 0.005
+            'lr': 0.005,
             'batch_size' : 1024,
             # Solved when min reward is at least this ...
             'solved_min_reward' : 200,
@@ -246,7 +246,8 @@ class LunarLanderTrainable(Trainable):
             'n_updates_per_iter' : 200,
             'eval_episodes' : 10,
             'eval_every_n_steps' : 5_000,
-            'max_return' : 300
+            # The max return value for any given episode (TODO: make sure it's used correctly)
+            'max_return' : 300,
             # Initial dh, dr values to use when our buffer is empty
             'init_dh' : 1,
             'ini_dr' : 0
