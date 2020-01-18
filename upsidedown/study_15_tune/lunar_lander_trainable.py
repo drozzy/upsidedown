@@ -1,5 +1,20 @@
 from ray.tune import Trainable
-from lib import ReplayBuffer, Command
+from lib import ReplayBuffer, Command, Trajectory, Rollout
+from model import Behavior
+from collections import namedtuple
+import torch.nn.functional as F
+import time 
+import gym
+from gym.wrappers.time_limit import TimeLimit
+from itertools import cycle
+import os
+from gym.wrappers.frame_stack import FrameStack
+import numpy as np
+import random
+import datetime
+import torch
+from torch import nn
+from itertools import count
 
 class LunarLanderTrainable(Trainable):
     def _setup(self, config):
@@ -15,9 +30,12 @@ class LunarLanderTrainable(Trainable):
         self.last_few = config['last_few']
         self.n_episodes_per_iter = config['n_episodes_per_iter']
         self.epsilon = config['epsilon']
-        self.max_return = config['max_return']
-        self.episodes = config['episodes']
+        self.max_return = config['max_return']        
         self.render = config['render']
+        self.return_scale = config['return_scale']
+        self.horizon_scale = config['horizon_scale']
+        self.init_dr = config['init_dr']
+        self.init_dh = config['init_dh']
 
         # Initialize 
         self.device = torch.device("cpu")
@@ -26,9 +44,10 @@ class LunarLanderTrainable(Trainable):
         self.loss = None
 
         self.env =  FrameStack(gym.make(self.env_name), num_stack=self.num_stack)
-        self.loss_object = torch.nn.CrossEntropyLoss().to(device)
+        self.loss_object = torch.nn.CrossEntropyLoss().to(self.device)
 
-        self.model = Behavior(hidden_size=self.hidden_size, state_shape=self.env.observation_space.shape, num_actions=self.env.action_space.n).to(device)
+        self.model = Behavior(hidden_size=self.hidden_size, state_shape=self.env.observation_space.shape, num_actions=self.env.action_space.n,
+            return_scale=self.return_scale, horizon_scale=self.horizon_scale).to(self.device)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
 
         self.rb = ReplayBuffer(max_size=self.replay_size, last_few=self.last_few)
@@ -68,7 +87,7 @@ class LunarLanderTrainable(Trainable):
 
         # add_artifact()
 
-    def do_iteration(env, model, optimizer, loss_object, writer, updates, steps, last_eval_step, rewards, rb):
+    def do_iteration(self): #env, model, optimizer, loss_object, writer, updates, steps, last_eval_step, rewards, rb):
         results = {}
 
         # Exloration
@@ -117,24 +136,24 @@ class LunarLanderTrainable(Trainable):
         exploration_cmd = self.rb.sample_command(self.init_dr, self.init_dh)
 
         # NOW CLEAR the buffer
-        rb.clear()
+        self.rb.clear()
 
         # Exploration    
-        roll = self.rollout(cmd=exploration_cmd, sample_action=True)
+        roll = self.rollout(cmd=exploration_cmd, sample_action=True, epsilon=self.epsilon)
         self.rb.add(roll.trajectories)
 
         steps = roll.length
-        return dr, dh, roll.length, roll.mean_reward, roll.mean_length
+        return exploration_cmd.dr, exploration_cmd.dh, roll.length, roll.mean_reward, roll.mean_length
 
-    def rollout(self, sample_action=True, cmd=None, render=False):
+    def rollout(self, epsilon, sample_action=True, cmd=None, render=False):
         assert cmd is not None
 
         trajectories = []
         rewards = [] 
         length = 0
 
-        for e in range(self.episodes):
-            t, reward = rollout_episode(sample_action=sample_action, cmd=cmd, render=render, epsilon=epsilon)
+        for e in range(self.n_episodes_per_iter):
+            t, reward = self.rollout_episode(sample_action=sample_action, cmd=cmd, render=render, epsilon=epsilon)
             
             trajectories.append(t)
             length += t.length
@@ -143,7 +162,7 @@ class LunarLanderTrainable(Trainable):
         if render:
             self.env.close()
         
-        return Rollout(episodes=self.episodes, trajectories=trajectories, rewards=rewards, length=length)
+        return Rollout(episodes=self.n_episodes_per_iter, trajectories=trajectories, rewards=rewards, length=length)
 
     def rollout_episode(self, sample_action, cmd, render, epsilon):
         """
@@ -171,10 +190,9 @@ class LunarLanderTrainable(Trainable):
             s_old = s        
             s, reward, done, info = self.env.step(action)
             
-            if model is not None:
-                dh = max(cmd.dh - 1, 1)
-                dr = min(cmd.dr - reward, self.max_return)
-                cmd = Command(dr=dr, dh=dh)
+            dh = max(cmd.dh - 1, 1)
+            dr = min(cmd.dr - reward, self.max_return)
+            cmd = Command(dr=dr, dh=dh)
                 
             t.add(prev_action, s_old, action, reward, s)    
             prev_action = action    
@@ -222,7 +240,7 @@ class LunarLanderTrainable(Trainable):
                 checkpoint_path)
         return checkpoint_path
 
-    @param
+    @property
     def default_config(self):
         # Environment to train on
         return {
@@ -250,7 +268,8 @@ class LunarLanderTrainable(Trainable):
             'max_return' : 300,
             # Initial dh, dr values to use when our buffer is empty
             'init_dh' : 1,
-            'ini_dr' : 0
+            'init_dr' : 0,
+            'render' : False
         }
 
 # Other implementation methods that may be helpful to override are _log_result, reset_config, _stop, and _export_model.

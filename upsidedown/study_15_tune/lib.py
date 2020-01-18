@@ -19,6 +19,9 @@ Command = namedtuple('Command', ['dr', 'dh'])
 # Batch-sized sample from the replay buffer, each element already a torch.tensor on device
 Sample = namedtuple('Sample', ['prev_action', 'state', 'dr', 'dh', 'action'])
 
+# Segment from a trajectory (numpy, single elements)
+Segment = namedtuple('Segment', ['prev_action', 'state', 'dr', 'dh', 'action'])
+
 class ReplayBuffer(object):
     
     def __init__(self, max_size, last_few):
@@ -55,7 +58,6 @@ class ReplayBuffer(object):
         self.buffer = sorted(self.buffer, key=lambda x: x.total_return, reverse=True)
         self.buffer = self.buffer[:self.max_size]
 
-    @property
     def stats(self):
         episodes = self.buffer[:self.last_few]
 
@@ -130,3 +132,53 @@ class ReplayBuffer(object):
         dr_0 = np.min([e.total_return for e in episodes])
         
         return Command(dh=dh_0, dr=dr_0)
+
+class Rollout(object):
+    def __init__(self, episodes, trajectories, rewards, length):
+        self.rewards = rewards
+        self.length = length
+        self.trajectories = trajectories
+        self.episodes = episodes
+
+    @property
+    def mean_length(self):
+        return self.length * 1.0 / self.episodes
+
+    @property
+    def mean_reward(self):
+        return np.mean(self.rewards)
+
+class Trajectory(object):
+    
+    def __init__(self):
+        self.trajectory = []
+        self.cum_sum = []
+        self.total_return = 0
+        self.length = 0
+        
+    def add(self, prev_action, state, action, reward, state_prime):
+        self.trajectory.append((prev_action, state, action, reward, state_prime))
+        if len(self.cum_sum) == 0:
+            self.cum_sum.append(reward)
+        else:
+            self.cum_sum.append(self.cum_sum[len(self.cum_sum)-1] + reward)
+        self.total_return += reward
+        self.length += 1
+    
+    def sample_segment(self):
+        T = self.length
+
+        t1 = random.randint(1, T)
+        # t1 = int(random.random() * (T+1)) # THIS IS FASTER by about 1/4
+        t2 = T #random.randint(t1, T)
+        
+        prev_action = self.trajectory[t1-1][0]
+        state = self.trajectory[t1-1][1]
+        action = self.trajectory[t1-1][2]
+
+        d_r = self.cum_sum[t2 - 1] - self.cum_sum[t1 - 2]
+        
+        d_h = t2 - t1 + 1.0
+
+        return Segment(prev_action=prev_action, state=state, dr=d_r, dh=d_h, action=action)
+
