@@ -29,6 +29,7 @@ class LunarLanderTrainable(Trainable):
         self.replay_size = config['replay_size']
         self.last_few = config['last_few']
         self.n_episodes_per_iter = config['n_episodes_per_iter']
+        self.n_updates_per_iter = config['n_updates_per_iter']
         self.epsilon = config['epsilon']
         self.max_return = config['max_return']        
         self.render = config['render']
@@ -36,11 +37,12 @@ class LunarLanderTrainable(Trainable):
         self.horizon_scale = config['horizon_scale']
         self.init_dr = config['init_dr']
         self.init_dh = config['init_dh']
+        self.batch_size = config['batch_size']
+
 
         # Initialize 
         self.device = torch.device("cpu")
         self.steps = 0
-        self.updates = 0
         self.loss = None
 
         self.env =  FrameStack(gym.make(self.env_name), num_stack=self.num_stack)
@@ -91,7 +93,6 @@ class LunarLanderTrainable(Trainable):
         results = {}
 
         # Exloration
-        print("Beginning exploration.")
         dr, dh, steps, mean_reward, mean_length = self.do_exploration()
         
         results['Rollout_Exploration/dr'] = dr
@@ -101,11 +102,10 @@ class LunarLanderTrainable(Trainable):
         results['Rollout_Exploration/steps'] = steps
         results['timesteps_this_iter'] = steps
         
-        # TODO: uncomment.
-        # # Updates    
-        # print("Beginning updates.")
-        # updates = do_updates(model, optimizer, loss_object, rb, writer, updates, steps)
+        avg_loss = self.do_updates()
             
+        results['Updates/loss'] = avg_loss
+
         # # Evaluation
         # print("Beginning evaluation.")
         # last_eval_step, done = do_eval(env=env, model=model, rb=rb, writer=writer, steps=steps, 
@@ -144,6 +144,31 @@ class LunarLanderTrainable(Trainable):
 
         steps = roll.length
         return exploration_cmd.dr, exploration_cmd.dh, roll.length, roll.mean_reward, roll.mean_length
+
+    def do_updates(self):
+        loss_sum = 0
+        loss_count = 0
+       
+        for _ in range(self.n_updates_per_iter):
+            sample = self.rb.sample(self.batch_size, self.device)    
+
+            loss = self.train_step(sample)
+            loss_sum += loss
+            loss_count += 1            
+
+        avg_loss = loss_sum/loss_count
+
+        return avg_loss
+
+    def train_step(self, sample):
+        self.optimizer.zero_grad()    
+        predictions = self.model(prev_action=sample.prev_action, state=sample.state, dr=sample.dr, dh=sample.dh)
+        loss = self.loss_object(predictions, sample.action)
+
+        loss.backward()
+        self.optimizer.step()
+        
+        return loss
 
     def rollout(self, epsilon, sample_action=True, cmd=None, render=False):
         assert cmd is not None
@@ -224,7 +249,6 @@ class LunarLanderTrainable(Trainable):
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             self.rb.load_state_dict(checkpoint['replay_buffer'])
             self.loss = checkpoint['loss']
-            self.updates = checkpoint['updates']
             self.steps = checkpoint['steps']
 
     def _save(self, checkpoint_dir):
@@ -235,7 +259,6 @@ class LunarLanderTrainable(Trainable):
                 'optimizer_state_dict': self.optimizer.state_dict(),
                 'replay_buffer' : self.rb.state_dict(),
                 'loss': self.loss,
-                'updates': self.updates,
                 'steps': self.steps}, 
                 checkpoint_path)
         return checkpoint_path
