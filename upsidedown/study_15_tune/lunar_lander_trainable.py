@@ -38,12 +38,18 @@ class LunarLanderTrainable(Trainable):
         self.init_dr = config['init_dr']
         self.init_dh = config['init_dh']
         self.batch_size = config['batch_size']
-
+        self.eval_episodes = config['eval_episodes']
+        self.max_steps = config['max_steps']
+        self.solved_min_reward = config['solved_min_reward']
+        self.solved_n_episodes = config['solved_n_episodes']
+        self.eval_every_n_steps = config['eval_every_n_steps']
 
         # Initialize 
         self.device = torch.device("cpu")
         self.steps = 0
         self.loss = None
+        self.rewards = []
+        self.last_eval_step = 0
 
         self.env =  FrameStack(gym.make(self.env_name), num_stack=self.num_stack)
         self.loss_object = torch.nn.CrossEntropyLoss().to(self.device)
@@ -92,24 +98,37 @@ class LunarLanderTrainable(Trainable):
     def do_iteration(self): #env, model, optimizer, loss_object, writer, updates, steps, last_eval_step, rewards, rb):
         results = {}
 
-        # Exloration
+        #### Exloration ####
+        print("Begining Exploration.")
         dr, dh, steps, mean_reward, mean_length = self.do_exploration()
         
-        results['Rollout_Exploration/dr'] = dr
-        results['Rollout_Exploration/dh'] = dh
-        results['Rollout_Exploration/reward_mean'] = mean_reward
-        results['Rollout_Exploration/length_mean'] = mean_length
-        results['Rollout_Exploration/steps'] = steps
+        results['Exploration/dr'] = dr
+        results['Exploration/dh'] = dh
+        results['Exploration/reward_mean'] = mean_reward
+        results['Exploration/length_mean'] = mean_length
+        results['Exploration/steps'] = steps
+        # Special value for ray/tune
         results['timesteps_this_iter'] = steps
         
+        #### Updates ####
+        print("Begining Updates.")
         avg_loss = self.do_updates()
             
         results['Updates/loss'] = avg_loss
+        # Special value for ray/tune
+        results['mean_loss'] = avg_loss
 
-        # # Evaluation
-        # print("Beginning evaluation.")
-        # last_eval_step, done = do_eval(env=env, model=model, rb=rb, writer=writer, steps=steps, 
-        #     rewards=rewards, last_eval_step=last_eval_step)
+        #### Evaluation ####
+        print("Begining Eval.")
+        last_eval_step, done_training, eval_dr, eval_dh, eval_mean_reward, eval_mean_length = self.do_eval()
+
+        results['Eval/dr'] = eval_dr
+        results['Eval/dh'] = eval_dh
+        results['Eval/mean_reward'] = eval_mean_reward        
+        results['Eval/mean_length'] = eval_mean_length
+        # Special value for ray/tune
+        results['episode_reward_mean'] = eval_mean_reward
+        results['done'] = done_training
 
         mean, std, mean_last, std_last, mean_len, std_len, mean_len_last, std_len_last = self.rb.stats()
         
@@ -124,7 +143,6 @@ class LunarLanderTrainable(Trainable):
         results['Buffer_Lengths/std_last_few'] = std_len_last
 
         # TODO: return also
-        # episode_reward_mean
         # mean_loss
         # mean_accuracy
         
@@ -139,7 +157,7 @@ class LunarLanderTrainable(Trainable):
         self.rb.clear()
 
         # Exploration    
-        roll = self.rollout(cmd=exploration_cmd, sample_action=True, epsilon=self.epsilon)
+        roll = self.rollout(episodes=self.n_episodes_per_iter, cmd=exploration_cmd, sample_action=True, epsilon=self.epsilon)
         self.rb.add(roll.trajectories)
 
         steps = roll.length
@@ -160,6 +178,42 @@ class LunarLanderTrainable(Trainable):
 
         return avg_loss
 
+    def do_eval(self):
+        
+        eval_cmd = self.rb.eval_command()
+
+        roll = self.rollout(episodes=self.eval_episodes, epsilon=0.0,
+                sample_action=True, cmd=eval_cmd)
+
+        steps_exceeded = self.steps >= self.max_steps
+        time_to_eval = ((self.steps - self.last_eval_step) >= self.eval_every_n_steps) or steps_exceeded or (self.last_eval_step == 0)
+
+        if not time_to_eval:
+            return self.last_eval_step, steps_exceeded
+
+        self.last_eval_step = self.steps
+
+        cmd = self.rb.eval_command()
+        
+        # Stopping criteria
+        self.rewards.extend(roll.rewards)
+        self.rewards = self.rewards[-self.solved_n_episodes:]
+        eval_min_reward = np.min(self.rewards)
+
+        solved = eval_min_reward >= self.solved_min_reward
+        if solved:
+            print(f"Task considered solved. Achieved {eval_min_reward} >= {self.solved_min_reward} over {self.solved_n_episodes} episodes.")
+        
+        done_training = solved or steps_exceeded
+
+        # writer.add_scalar('Eval/dr', cmd.dr, steps)
+        # writer.add_scalar('Eval/dh', cmd.dh, steps)
+        
+        # writer.add_scalar('Eval/reward', roll.mean_reward, steps) 
+        # writer.add_scalar('Eval/length', roll.mean_length, steps)
+
+        return last_eval_step, done_training, cmd.dr, cmd.dh, roll.mean_reward, roll.mean_length
+
     def train_step(self, sample):
         self.optimizer.zero_grad()    
         predictions = self.model(prev_action=sample.prev_action, state=sample.state, dr=sample.dr, dh=sample.dh)
@@ -170,14 +224,14 @@ class LunarLanderTrainable(Trainable):
         
         return loss
 
-    def rollout(self, epsilon, sample_action=True, cmd=None, render=False):
+    def rollout(self, episodes, epsilon, sample_action=True, cmd=None, render=False):
         assert cmd is not None
 
         trajectories = []
         rewards = [] 
         length = 0
 
-        for e in range(self.n_episodes_per_iter):
+        for e in range(episodes):
             t, reward = self.rollout_episode(sample_action=sample_action, cmd=cmd, render=render, epsilon=epsilon)
             
             trajectories.append(t)
@@ -187,7 +241,7 @@ class LunarLanderTrainable(Trainable):
         if render:
             self.env.close()
         
-        return Rollout(episodes=self.n_episodes_per_iter, trajectories=trajectories, rewards=rewards, length=length)
+        return Rollout(episodes=episodes, trajectories=trajectories, rewards=rewards, length=length)
 
     def rollout_episode(self, sample_action, cmd, render, epsilon):
         """
@@ -250,6 +304,7 @@ class LunarLanderTrainable(Trainable):
             self.rb.load_state_dict(checkpoint['replay_buffer'])
             self.loss = checkpoint['loss']
             self.steps = checkpoint['steps']
+            self.rewards = checkpoint['rewards']
 
     def _save(self, checkpoint_dir):
         checkpoint_path = os.path.join(checkpoint_dir, "checkpoint.pt")
@@ -259,6 +314,7 @@ class LunarLanderTrainable(Trainable):
                 'optimizer_state_dict': self.optimizer.state_dict(),
                 'replay_buffer' : self.rb.state_dict(),
                 'loss': self.loss,
+                'rewards': self.rewards,
                 'steps': self.steps}, 
                 checkpoint_path)
         return checkpoint_path
@@ -284,7 +340,7 @@ class LunarLanderTrainable(Trainable):
             'replay_size' : 100,
             'n_episodes_per_iter' : 100,
             'last_few' : 10,
-            'n_updates_per_iter' : 200,
+            'n_updates_per_iter' : 100,
             'eval_episodes' : 10,
             'eval_every_n_steps' : 5_000,
             # The max return value for any given episode (TODO: make sure it's used correctly)
