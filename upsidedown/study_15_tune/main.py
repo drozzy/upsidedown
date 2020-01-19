@@ -4,6 +4,8 @@ from ray import tune
 
 def main():
     ray.init()
+    # To debug in sequential mode run:
+    # ray.init(local_mode=True)
     analysis = tune.run(
         LunarLanderTrainable,
         config={
@@ -13,7 +15,7 @@ def main():
         num_samples=10,
         checkpoint_freq=1,
         checkpoint_at_end=True,
-        max_failures=1
+        max_failures=0
     )
 
     print("Best config is:", analysis.get_best_config(metric="Buffer_Rewards/mean_last_few"))

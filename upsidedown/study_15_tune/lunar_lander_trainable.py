@@ -112,35 +112,35 @@ class LunarLanderTrainable(Trainable):
         
         #### Updates ####
         print("Begining Updates.")
-        avg_loss = self.do_updates()
+        mean_loss = self.do_updates()
             
-        results['Updates/loss'] = avg_loss
+        results['Updates/mean_loss'] = mean_loss
         # Special value for ray/tune
-        results['mean_loss'] = avg_loss
+        results['mean_loss'] = mean_loss
 
         #### Evaluation ####
         print("Begining Eval.")
-        last_eval_step, done_training, eval_dr, eval_dh, eval_mean_reward, eval_mean_length = self.do_eval()
+        done_training, eval_dr, eval_dh, eval_mean_reward, eval_mean_length = self.do_eval()
 
         results['Eval/dr'] = eval_dr
         results['Eval/dh'] = eval_dh
-        results['Eval/mean_reward'] = eval_mean_reward        
-        results['Eval/mean_length'] = eval_mean_length
+        results['Eval/reward_mean'] = eval_mean_reward        
+        results['Eval/length_mean'] = eval_mean_length
         # Special value for ray/tune
         results['episode_reward_mean'] = eval_mean_reward
         results['done'] = done_training
 
         mean, std, mean_last, std_last, mean_len, std_len, mean_len_last, std_len_last = self.rb.stats()
         
-        results['Buffer_Rewards/mean'] = mean
-        results['Buffer_Rewards/std'] = std
-        results['Buffer_Rewards/mean_last_few'] = mean_last
-        results['Buffer_Rewards/std_last_few'] = std_last
+        results['Buffer/reward_mean'] = mean
+        results['Buffer/reward_std'] = std
+        results['Buffer/last_few_reward_mean'] = mean_last
+        results['Buffer/last_few_reward_std'] = std_last
 
-        results['Buffer_Lengths/mean'] = mean_len
-        results['Buffer_Lengths/std'] = std_len
-        results['Buffer_Lengths/mean_last_few'] = mean_len_last
-        results['Buffer_Lengths/std_last_few'] = std_len_last
+        results['Buffer/length_mean'] = mean_len
+        results['Buffer/length_std'] = std_len
+        results['Buffer/last_few_length_mean'] = mean_len_last
+        results['Buffer/last_few_length_std'] = std_len_last
 
         # TODO: return also
         # mean_loss
@@ -212,7 +212,7 @@ class LunarLanderTrainable(Trainable):
         # writer.add_scalar('Eval/reward', roll.mean_reward, steps) 
         # writer.add_scalar('Eval/length', roll.mean_length, steps)
 
-        return last_eval_step, done_training, cmd.dr, cmd.dh, roll.mean_reward, roll.mean_length
+        return done_training, cmd.dr, cmd.dh, roll.mean_reward, roll.mean_length
 
     def train_step(self, sample):
         self.optimizer.zero_grad()    
@@ -222,7 +222,7 @@ class LunarLanderTrainable(Trainable):
         loss.backward()
         self.optimizer.step()
         
-        return loss
+        return loss.detach().numpy()
 
     def rollout(self, episodes, epsilon, sample_action=True, cmd=None, render=False):
         assert cmd is not None
@@ -302,7 +302,6 @@ class LunarLanderTrainable(Trainable):
             self.model.load_state_dict(checkpoint['model_state_dict'])
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             self.rb.load_state_dict(checkpoint['replay_buffer'])
-            self.loss = checkpoint['loss']
             self.steps = checkpoint['steps']
             self.rewards = checkpoint['rewards']
 
@@ -313,7 +312,6 @@ class LunarLanderTrainable(Trainable):
                 'model_state_dict': self.model.state_dict(),
                 'optimizer_state_dict': self.optimizer.state_dict(),
                 'replay_buffer' : self.rb.state_dict(),
-                'loss': self.loss,
                 'rewards': self.rewards,
                 'steps': self.steps}, 
                 checkpoint_path)
@@ -330,17 +328,17 @@ class LunarLanderTrainable(Trainable):
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
             'lr': 0.005,
-            'batch_size' : 1024,
+            'batch_size' : 512,
             # Solved when min reward is at least this ...
             'solved_min_reward' : 200,
             # ... over this many episodes
             'solved_n_episodes' :  100,
-            'max_steps' : 10**7,
+            'max_steps' : 10**6,
             # Maximum size of the replay buffer in episodes
-            'replay_size' : 100,
-            'n_episodes_per_iter' : 100,
+            'replay_size' : 80,
+            'n_episodes_per_iter' : 80,
             'last_few' : 10,
-            'n_updates_per_iter' : 100,
+            'n_updates_per_iter' : 50,
             'eval_episodes' : 10,
             'eval_every_n_steps' : 5_000,
             # The max return value for any given episode (TODO: make sure it's used correctly)
