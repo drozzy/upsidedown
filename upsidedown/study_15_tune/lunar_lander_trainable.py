@@ -45,7 +45,7 @@ class LunarLanderTrainable(Trainable):
         self.eval_every_n_steps = config['eval_every_n_steps']
 
         # Initialize 
-        self.device = torch.device("cpu")
+        self.device = torch.device("cuda")
         self.steps = 0
         self.loss = None
         self.rewards = []
@@ -141,6 +141,10 @@ class LunarLanderTrainable(Trainable):
         results['Buffer/length_std'] = std_len
         results['Buffer/last_few_length_mean'] = mean_len_last
         results['Buffer/last_few_length_std'] = std_len_last
+
+        results['Params/lr'] = self.lr
+        results['Params/last_few'] = self.last_few
+        results['Params/epsilon'] = self.epsilon
 
         # TODO: return also
         # mean_loss
@@ -324,10 +328,10 @@ class LunarLanderTrainable(Trainable):
             'env_name': 'LunarLander-v2',
             'num_stack' : 10,
             'hidden_size' : 32,
-            'epsilon' : 0.0,
+            # 'epsilon' : 0.0,
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
-            'lr': 0.005,
+            # 'lr': 0.005,
             'batch_size' : 512,
             # Solved when min reward is at least this ...
             'solved_min_reward' : 200,
@@ -337,7 +341,7 @@ class LunarLanderTrainable(Trainable):
             # Maximum size of the replay buffer in episodes
             'replay_size' : 80,
             'n_episodes_per_iter' : 80,
-            'last_few' : 10,
+            # 'last_few' : 10,
             'n_updates_per_iter' : 50,
             'eval_episodes' : 10,
             'eval_every_n_steps' : 5_000,

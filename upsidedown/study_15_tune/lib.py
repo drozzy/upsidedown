@@ -38,7 +38,7 @@ class ReplayBuffer(object):
     def state_dict(self):
         return {'max_size' : self.max_size, 'cur_size' : self.cur_size, 'buffer': self.buffer, 'last_few': self.last_few}
 
-    def load_state_dict(state_dict):
+    def load_state_dict(self, state_dict):
         self.max_size = state_dict['max_size']
         self.cur_size = state_dict['cur_size']
         self.buffer = state_dict['buffer']
