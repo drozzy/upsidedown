@@ -18,7 +18,7 @@ from torch import nn
 from itertools import count
 
 class LunarLanderTrainable(Trainable):
-    def _setup(self, config):
+    def _setup(self, config={}):
         d = self.default_config
         d.update(config)
         self.config = d
@@ -85,19 +85,9 @@ class LunarLanderTrainable(Trainable):
         """
         Do one iteration of training
         """
-        # last_eval_step = 0
-        # rewards = []
-        # done = False
-        # while not done:
-        #     steps, updates, last_eval_step, done = do_iteration(env=env, model=model, rb=rb, optimizer=optimizer, 
-        #         loss_object=loss_object,  writer=writer, updates=updates, steps=steps,
-        #         last_eval_step=last_eval_step, rewards=rewards)
-
         return self.do_iteration()
 
-        # add_artifact()
-
-    def do_iteration(self): #env, model, optimizer, loss_object, writer, updates, steps, last_eval_step, rewards, rb):
+    def do_iteration(self):
         results = {}
 
         #### Exloration ####
@@ -149,12 +139,7 @@ class LunarLanderTrainable(Trainable):
         results['Params/last_few'] = self.last_few
         results['Params/epsilon'] = self.annealed_epsilon
 
-        # TODO: return also
-        # mean_loss
-        # mean_accuracy
-        
-
-        return results # steps, updates, last_eval_step, done   
+        return results
 
     @property
     def annealed_epsilon(self):
