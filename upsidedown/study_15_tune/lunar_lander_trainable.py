@@ -4,6 +4,7 @@ from model import Behavior
 from collections import namedtuple
 import torch.nn.functional as F
 import time 
+import math
 import gym
 from gym.wrappers.time_limit import TimeLimit
 from itertools import cycle
@@ -18,34 +19,35 @@ from itertools import count
 
 class LunarLanderTrainable(Trainable):
     def _setup(self, config):
-        self.config = config
-        self.config.update(self.default_config)
+        d = self.default_config
+        d.update(config)
+        self.config = d
 
         # Fill in from config
-        self.env_name = config['env_name']
-        self.num_stack = config['num_stack']
-        self.hidden_size = config['hidden_size']
-        self.lr = config['lr']
-        self.replay_size = config['replay_size']
-        self.last_few = config['last_few']
-        self.n_episodes_per_iter = config['n_episodes_per_iter']
-        self.n_updates_per_iter = config['n_updates_per_iter']
-        self.epsilon = config['epsilon']
-        self.max_return = config['max_return']        
-        self.render = config['render']
-        self.return_scale = config['return_scale']
-        self.horizon_scale = config['horizon_scale']
-        self.init_dr = config['init_dr']
-        self.init_dh = config['init_dh']
-        self.batch_size = config['batch_size']
-        self.eval_episodes = config['eval_episodes']
-        self.max_steps = config['max_steps']
-        self.solved_min_reward = config['solved_min_reward']
-        self.solved_n_episodes = config['solved_n_episodes']
-        self.eval_every_n_steps = config['eval_every_n_steps']
+        self.env_name = self.config['env_name']
+        self.num_stack = self.config['num_stack']
+        self.hidden_size = self.config['hidden_size']
+        self.lr = self.config['lr']
+        self.replay_size = self.config['replay_size']
+        self.last_few = self.config['last_few']
+        self.n_episodes_per_iter = self.config['n_episodes_per_iter']
+        self.n_updates_per_iter = self.config['n_updates_per_iter']
+        self.epsilon = self.config['epsilon']
+        self.max_return = self.config['max_return']        
+        self.render = self.config['render']
+        self.return_scale = self.config['return_scale']
+        self.horizon_scale = self.config['horizon_scale']
+        self.init_dr = self.config['init_dr']
+        self.init_dh = self.config['init_dh']
+        self.batch_size = self.config['batch_size']
+        self.eval_episodes = self.config['eval_episodes']
+        self.max_steps = self.config['max_steps']
+        self.solved_min_reward = self.config['solved_min_reward']
+        self.solved_n_episodes = self.config['solved_n_episodes']
+        self.epsilon_decay = self.config['epsilon_decay']
 
         # Initialize 
-        self.device = torch.device("cuda")
+        self.device = torch.device("cpu")
         self.steps = 0
         self.loss = None
         self.rewards = []
@@ -101,6 +103,7 @@ class LunarLanderTrainable(Trainable):
         #### Exloration ####
         print("Begining Exploration.")
         dr, dh, steps, mean_reward, mean_length = self.do_exploration()
+        self.steps += steps
         
         results['Exploration/dr'] = dr
         results['Exploration/dh'] = dh
@@ -144,7 +147,7 @@ class LunarLanderTrainable(Trainable):
 
         results['Params/lr'] = self.lr
         results['Params/last_few'] = self.last_few
-        results['Params/epsilon'] = self.epsilon
+        results['Params/epsilon'] = self.annealed_epsilon
 
         # TODO: return also
         # mean_loss
@@ -152,6 +155,21 @@ class LunarLanderTrainable(Trainable):
         
 
         return results # steps, updates, last_eval_step, done   
+
+    @property
+    def annealed_epsilon(self):
+        # Anneal epsilon
+        
+        EPS_START = self.epsilon
+        EPS_END = 0.0
+        EPS_DECAY = self.epsilon_decay
+
+        sample = random.random()
+        annealed = EPS_END + (EPS_START - EPS_END) * \
+            math.exp(-1. * self.steps / EPS_DECAY)
+        
+        return annealed
+
 
     def do_exploration(self):
         # Sample command for the exploration
@@ -161,7 +179,7 @@ class LunarLanderTrainable(Trainable):
         self.rb.clear()
 
         # Exploration    
-        roll = self.rollout(episodes=self.n_episodes_per_iter, cmd=exploration_cmd, sample_action=True, epsilon=self.epsilon)
+        roll = self.rollout(episodes=self.n_episodes_per_iter, cmd=exploration_cmd, sample_action=True, epsilon=self.annealed_epsilon)
         self.rb.add(roll.trajectories)
 
         steps = roll.length
@@ -190,10 +208,6 @@ class LunarLanderTrainable(Trainable):
                 sample_action=True, cmd=eval_cmd)
 
         steps_exceeded = self.steps >= self.max_steps
-        time_to_eval = ((self.steps - self.last_eval_step) >= self.eval_every_n_steps) or steps_exceeded or (self.last_eval_step == 0)
-
-        if not time_to_eval:
-            return self.last_eval_step, steps_exceeded
 
         self.last_eval_step = self.steps
 
@@ -328,25 +342,37 @@ class LunarLanderTrainable(Trainable):
             'env_name': 'LunarLander-v2',
             'num_stack' : 10,
             'hidden_size' : 32,
-            # 'epsilon' : 0.0,
+
+            # Starting epsilon value for exploration
+            'epsilon' : 0.0,
+            # how fast to decay the epsilon to zero (larger value means slower decay?)            
+            'epsilon_decay' : 100_000,
+
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
-            # 'lr': 0.005,
+            'lr': 0.001,
             'batch_size' : 512,
+
             # Solved when min reward is at least this ...
             'solved_min_reward' : 200,
             # ... over this many episodes
             'solved_n_episodes' :  100,
             'max_steps' : 10**6,
+
             # Maximum size of the replay buffer in episodes
             'replay_size' : 80,
             'n_episodes_per_iter' : 80,
-            # 'last_few' : 10,
+
+            # How many last episodes to use for selecting the desire/horizon from
+            'last_few' : 10,
+
+            # How many updates of the model to do by sampling from the replay buffer
             'n_updates_per_iter' : 50,
             'eval_episodes' : 10,
-            'eval_every_n_steps' : 5_000,
+
             # The max return value for any given episode (TODO: make sure it's used correctly)
             'max_return' : 300,
+
             # Initial dh, dr values to use when our buffer is empty
             'init_dh' : 1,
             'init_dr' : 0,
