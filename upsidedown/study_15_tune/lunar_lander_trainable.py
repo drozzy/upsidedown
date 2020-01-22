@@ -23,6 +23,12 @@ class LunarLanderTrainable(Trainable):
         d.update(config)
         self.config = d
 
+        self.seed =  self.config['seed']
+        if self.seed is not None:
+            random.seed(self.seed)
+            torch.manual_seed(self.seed)
+            np.random.seed(self.seed)
+
         # Fill in from config
         self.env_name = self.config['env_name']
         self.num_stack = self.config['num_stack']
@@ -54,6 +60,7 @@ class LunarLanderTrainable(Trainable):
         self.last_eval_step = 0
 
         self.env =  FrameStack(gym.make(self.env_name), num_stack=self.num_stack)
+        self.env.seed(self.seed)
         self.loss_object = torch.nn.CrossEntropyLoss().to(self.device)
 
         self.model = Behavior(hidden_size=self.hidden_size, state_shape=self.env.observation_space.shape, num_actions=self.env.action_space.n,
@@ -324,6 +331,7 @@ class LunarLanderTrainable(Trainable):
     def default_config(self):
         # Environment to train on
         return {
+            'seed' : None,
             'env_name': 'LunarLander-v2',
             'num_stack' : 10,
             'hidden_size' : 32,
