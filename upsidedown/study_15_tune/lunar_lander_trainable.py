@@ -19,9 +19,8 @@ from itertools import count
 
 class LunarLanderTrainable(Trainable):
     def _setup(self, config={}):
-        d = self.default_config
-        d.update(config)
-        self.config = d
+        self.config = self.default_config
+        self.config.update(config)
 
         self.seed =  self.config['seed']
         if self.seed is not None:
@@ -68,8 +67,6 @@ class LunarLanderTrainable(Trainable):
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
 
         self.rb = ReplayBuffer(max_size=self.replay_size, last_few=self.last_few)
-        # env_name, _run, experiment_name, hidden_size, lr, replay_size, last_few, max_episode_steps, num_stack):
-
     
 
     def play(self, dr=300, dh=300, sample_action=True, play_episodes=5):
@@ -77,10 +74,6 @@ class LunarLanderTrainable(Trainable):
         Play a few episodes with the currently trained policy.
         """
         cmd = Command(dr=dr, dh=dh)
-
-        # loss_object = torch.nn.CrossEntropyLoss().to(device)
-        # model = Behavior(hidden_size=hidden_size,state_shape=env.observation_space.shape, num_actions=env.action_space.n).to(device)
-        # optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
 
         for _ in range(play_episodes):
             roll = self.rollout(episodes=1, sample_action=sample_action, 
@@ -215,12 +208,6 @@ class LunarLanderTrainable(Trainable):
             print(f"Task considered solved. Achieved {eval_min_reward} >= {self.solved_min_reward} over {self.solved_n_episodes} episodes.")
         
         done_training = solved or steps_exceeded
-
-        # writer.add_scalar('Eval/dr', cmd.dr, steps)
-        # writer.add_scalar('Eval/dh', cmd.dh, steps)
-        
-        # writer.add_scalar('Eval/reward', roll.mean_reward, steps) 
-        # writer.add_scalar('Eval/length', roll.mean_length, steps)
 
         return done_training, cmd.dr, cmd.dh, roll.mean_reward, roll.mean_length
 
@@ -371,5 +358,3 @@ class LunarLanderTrainable(Trainable):
             'init_dr' : 0,
             'render' : False
         }
-
-# Other implementation methods that may be helpful to override are _log_result, reset_config, _stop, and _export_model.
