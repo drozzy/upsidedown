@@ -325,7 +325,7 @@ class LunarLanderTrainable(Trainable):
 
             # Starting epsilon value for exploration
             'epsilon' : 0.0,
-            # how fast to decay the epsilon to zero (larger value means slower decay?)            
+            # how fast to decay the epsilon to zero (X-value decays epsilon in approximately 10X steps. E.g. 100_000 decay reduces it to zero in 1_000_000 steps)            
             'epsilon_decay' : 100_000,
 
             'return_scale': 0.01,
