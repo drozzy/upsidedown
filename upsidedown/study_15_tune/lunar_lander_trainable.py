@@ -33,6 +33,8 @@ class LunarLanderTrainable(Trainable):
         self.num_stack = self.config['num_stack']
         self.hidden_size = self.config['hidden_size']
         self.lr = self.config['lr']
+        self.lr_end = self.config['lr_end']
+        self.lr_decay = self.config['lr_decay']
         self.replay_size = self.config['replay_size']
         self.last_few = self.config['last_few']
         self.n_episodes_per_iter = self.config['n_episodes_per_iter']
@@ -155,13 +157,27 @@ class LunarLanderTrainable(Trainable):
         
         return annealed
 
+    @property
+    def annealed_lr(self):
+        # Anneal epsilon
+        
+        EPS_START = self.lr
+        EPS_END =   self.lr_end
+        EPS_DECAY = self.lr_decay
+
+        sample = random.random()
+        annealed = EPS_END + (EPS_START - EPS_END) * \
+            math.exp(-1. * self.steps / EPS_DECAY)
+        
+        return annealed
+
 
     def do_exploration(self):
         # Sample command for the exploration
         exploration_cmd = self.rb.sample_command(self.init_dr, self.init_dh)
 
         # NOW CLEAR the buffer
-        self.rb.clear()
+        # self.rb.clear()
 
         # Exploration    
         roll = self.rollout(episodes=self.n_episodes_per_iter, cmd=exploration_cmd, sample_action=True, epsilon=self.annealed_epsilon)
@@ -267,7 +283,7 @@ class LunarLanderTrainable(Trainable):
             s, reward, done, info = self.env.step(action)
             
             dh = max(cmd.dh - 1, 1)
-            dr = min(cmd.dr - reward, self.max_return)
+            dr = cmd.dr - reward
             cmd = Command(dr=dr, dh=dh)
                 
             t.add(prev_action, s_old, action, reward, s)    
@@ -330,18 +346,20 @@ class LunarLanderTrainable(Trainable):
 
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
-            'lr': 0.001,
+            'lr': 0.01,
+            'lr_end': 0.0001,
+            'lr_decay' : 500_000,
             'batch_size' : 512,
 
             # Solved when min reward is at least this ...
             'solved_min_reward' : 200,
             # ... over this many episodes
             'solved_n_episodes' :  100,
-            'max_steps' : 10**6,
+            'max_steps' : 10**7,
 
             # Maximum size of the replay buffer in episodes
             'replay_size' : 80,
-            'n_episodes_per_iter' : 80,
+            'n_episodes_per_iter' : 10,
 
             # How many last episodes to use for selecting the desire/horizon from
             'last_few' : 10,

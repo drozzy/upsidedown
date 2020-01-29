@@ -42,6 +42,7 @@ class ReplayBuffer(object):
         self.max_size = state_dict['max_size']
         self.cur_size = state_dict['cur_size']
         self.buffer = state_dict['buffer']
+        self.sorter_buffer = sorted(state_dict['buffer'], key=lambda x: x.total_return, reverse=True)
         self.last_few = state_dict['last_few']
 
     def add(self, trajectories):
@@ -54,12 +55,12 @@ class ReplayBuffer(object):
             
     def _add(self, trajectory):
         self.buffer.append(trajectory)
-        
-        self.buffer = sorted(self.buffer, key=lambda x: x.total_return, reverse=True)
-        self.buffer = self.buffer[:self.max_size]
+        self.sorted_buffer = sorted(self.buffer, key=lambda x: x.total_return, reverse=True)
+        self.buffer = self.buffer[-self.max_size:]
+        self.sorted_buffer = self.sorted_buffer[:self.max_size]
 
     def stats(self):
-        episodes = self.buffer[:self.last_few]
+        episodes = self.sorted_buffer[:self.last_few]
 
         mean_last = np.mean([e.total_return for e in episodes])
         std_last =  np.std([e.total_return for e in episodes])
@@ -109,7 +110,7 @@ class ReplayBuffer(object):
         if len(self.buffer) == 0:
             return Command(dr=init_dr, dh=init_dh)
 
-        episodes = self.buffer[:self.last_few]
+        episodes = self.sorted_buffer[:self.last_few]
         
         # This seems to work for cartpole:
         # dh_0 = 2 * np.max([e.length for e in episodes])
@@ -125,7 +126,7 @@ class ReplayBuffer(object):
         return Command(dh=dh_0, dr=dr_0)
 
     def eval_command(self):
-        episodes = self.buffer[:self.last_few]
+        episodes = self.sorted_buffer[:self.last_few]
         
         dh_0 = np.mean([e.length for e in episodes])
         
