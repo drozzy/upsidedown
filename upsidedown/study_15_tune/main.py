@@ -7,7 +7,7 @@ import random
 import numpy as np
 
 def main():
-    ray.init(num_cpus=1)
+    ray.init()
     # To debug in sequential mode run:
     # ray.init(local_mode=True)
     # analysis = tune.run(
@@ -48,7 +48,10 @@ def main():
         # config=search_space,
         # resume=True,
         # Repeat experiments multiple times
-        num_samples=100,
+        num_samples=10,
+        checkpoint_freq=1,
+        keep_checkpoints_num=3,
+        checkpoint_score_attr='episode_reward_mean',
         checkpoint_at_end=True #,
         # scheduler=ASHAScheduler(
         #     time_attr='training_iteration',
