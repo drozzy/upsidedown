@@ -66,7 +66,7 @@ class LunarLanderTrainable(Trainable):
 
         self.model = Behavior(hidden_size=self.hidden_size, state_shape=self.env.observation_space.shape, num_actions=self.env.action_space.n,
             return_scale=self.return_scale, horizon_scale=self.horizon_scale).to(self.device)
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.annealed_lr)
 
         self.rb = ReplayBuffer(max_size=self.replay_size, last_few=self.last_few)
     
@@ -137,7 +137,7 @@ class LunarLanderTrainable(Trainable):
         results['Buffer/last_few_length_mean'] = mean_len_last
         results['Buffer/last_few_length_std'] = std_len_last
 
-        results['Params/lr'] = self.lr
+        results['Params/lr'] = self.annealed_lr
         results['Params/last_few'] = self.last_few
         results['Params/epsilon'] = self.annealed_epsilon
 
@@ -336,20 +336,20 @@ class LunarLanderTrainable(Trainable):
         return {
             'seed' : None,
             'env_name': 'LunarLander-v2',
-            'num_stack' : 10,
+            'num_stack' : 4,
             'hidden_size' : 32,
 
             # Starting epsilon value for exploration
-            'epsilon' : 0.0,
+            'epsilon' : 0.99,
             # how fast to decay the epsilon to zero (X-value decays epsilon in approximately 10X steps. E.g. 100_000 decay reduces it to zero in 1_000_000 steps)            
             'epsilon_decay' : 100_000,
 
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
-            'lr': 0.01,
+            'lr': 0.1,
             'lr_end': 0.0001,
             'lr_decay' : 500_000,
-            'batch_size' : 512,
+            'batch_size' : 1024,
 
             # Solved when min reward is at least this ...
             'solved_min_reward' : 200,
@@ -358,14 +358,14 @@ class LunarLanderTrainable(Trainable):
             'max_steps' : 10**7,
 
             # Maximum size of the replay buffer in episodes
-            'replay_size' : 80,
-            'n_episodes_per_iter' : 10,
+            'replay_size' : 512,
+            'n_episodes_per_iter' : 8,
 
             # How many last episodes to use for selecting the desire/horizon from
-            'last_few' : 10,
+            'last_few' : 16,
 
             # How many updates of the model to do by sampling from the replay buffer
-            'n_updates_per_iter' : 50,
+            'n_updates_per_iter' : 128,
             'eval_episodes' : 10,
 
             # The max return value for any given episode (TODO: make sure it's used correctly)
