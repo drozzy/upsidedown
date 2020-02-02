@@ -7,7 +7,7 @@ import random
 import numpy as np
 
 def main():
-    ray.init()
+    ray.init(num_cpus=1)
     # To debug in sequential mode run:
     # ray.init(local_mode=True)
     # analysis = tune.run(
@@ -48,7 +48,7 @@ def main():
         # config=search_space,
         # resume=True,
         # Repeat experiments multiple times
-        num_samples=10,
+        num_samples=8,
         checkpoint_freq=1,
         keep_checkpoints_num=3,
         checkpoint_score_attr='episode_reward_mean',

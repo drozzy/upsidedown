@@ -33,14 +33,11 @@ class LunarLanderTrainable(Trainable):
         self.num_stack = self.config['num_stack']
         self.hidden_size = self.config['hidden_size']
         self.lr = self.config['lr']
-        self.lr_end = self.config['lr_end']
-        self.lr_decay = self.config['lr_decay']
         self.replay_size = self.config['replay_size']
         self.last_few = self.config['last_few']
         self.n_episodes_per_iter = self.config['n_episodes_per_iter']
         self.n_updates_per_iter = self.config['n_updates_per_iter']
         self.epsilon = self.config['epsilon']
-        self.max_return = self.config['max_return']        
         self.render = self.config['render']
         self.return_scale = self.config['return_scale']
         self.horizon_scale = self.config['horizon_scale']
@@ -66,7 +63,10 @@ class LunarLanderTrainable(Trainable):
 
         self.model = Behavior(hidden_size=self.hidden_size, state_shape=self.env.observation_space.shape, num_actions=self.env.action_space.n,
             return_scale=self.return_scale, horizon_scale=self.horizon_scale).to(self.device)
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.annealed_lr)
+        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.9)
+        self.scheduler = torch.optim.lr_scheduler.CyclicLR(self.optimizer, base_lr=0.0001, max_lr=self.lr,
+            step_size_up=200)
 
         self.rb = ReplayBuffer(max_size=self.replay_size, last_few=self.last_few)
     
@@ -137,7 +137,7 @@ class LunarLanderTrainable(Trainable):
         results['Buffer/last_few_length_mean'] = mean_len_last
         results['Buffer/last_few_length_std'] = std_len_last
 
-        results['Params/lr'] = self.annealed_lr
+        results['Params/lr'] = self.optimizer.param_groups[0]['lr']
         results['Params/last_few'] = self.last_few
         results['Params/epsilon'] = self.annealed_epsilon
 
@@ -156,21 +156,6 @@ class LunarLanderTrainable(Trainable):
             math.exp(-1. * self.steps / EPS_DECAY)
         
         return annealed
-
-    @property
-    def annealed_lr(self):
-        # Anneal epsilon
-        
-        EPS_START = self.lr
-        EPS_END =   self.lr_end
-        EPS_DECAY = self.lr_decay
-
-        sample = random.random()
-        annealed = EPS_END + (EPS_START - EPS_END) * \
-            math.exp(-1. * self.steps / EPS_DECAY)
-        
-        return annealed
-
 
     def do_exploration(self):
         # Sample command for the exploration
@@ -198,6 +183,8 @@ class LunarLanderTrainable(Trainable):
             loss_count += 1            
 
         avg_loss = loss_sum/loss_count
+
+        self.scheduler.step()
 
         return avg_loss
 
@@ -346,10 +333,8 @@ class LunarLanderTrainable(Trainable):
 
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
-            'lr': 0.1,
-            'lr_end': 0.0001,
-            'lr_decay' : 500_000,
-            'batch_size' : 1024,
+            'lr': 0.1,            
+            'batch_size' : 512,
 
             # Solved when min reward is at least this ...
             'solved_min_reward' : 200,
@@ -365,11 +350,8 @@ class LunarLanderTrainable(Trainable):
             'last_few' : 16,
 
             # How many updates of the model to do by sampling from the replay buffer
-            'n_updates_per_iter' : 128,
-            'eval_episodes' : 10,
-
-            # The max return value for any given episode (TODO: make sure it's used correctly)
-            'max_return' : 300,
+            'n_updates_per_iter' : 50,
+            'eval_episodes' : 5,
 
             # Initial dh, dr values to use when our buffer is empty
             'init_dh' : 1,
