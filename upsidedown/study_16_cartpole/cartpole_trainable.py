@@ -66,10 +66,10 @@ class CartPoleTrainable(Trainable):
 
         self.model = Behavior(hidden_size=self.hidden_size, state_shape=self.env.observation_space.shape, num_actions=self.env.action_space.n,
             return_scale=self.return_scale, horizon_scale=self.horizon_scale).to(self.device)
-        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.9)
-        self.scheduler = torch.optim.lr_scheduler.CyclicLR(self.optimizer, base_lr=0.0001, max_lr=self.lr,
-            step_size_up=200)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        # self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.9)
+        # self.scheduler = torch.optim.lr_scheduler.CyclicLR(self.optimizer, base_lr=0.0001, max_lr=self.lr,
+        #     step_size_up=200)
 
         self.rb = ReplayBuffer(max_size=self.replay_size, last_few=self.last_few)
     
@@ -187,7 +187,7 @@ class CartPoleTrainable(Trainable):
 
         avg_loss = loss_sum/loss_count
 
-        self.scheduler.step()
+        # self.scheduler.step()
 
         return avg_loss
 
@@ -336,7 +336,7 @@ class CartPoleTrainable(Trainable):
 
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
-            'lr': 0.1,            
+            'lr': 0.001,            
             'batch_size' : 512,
 
             # Solved when min reward is at least this ...
