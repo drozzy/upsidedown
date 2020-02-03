@@ -74,15 +74,15 @@ class CartPoleTrainable(Trainable):
         self.rb = ReplayBuffer(max_size=self.replay_size, last_few=self.last_few)
     
 
-    def play(self, dr=300, dh=300, sample_action=True, play_episodes=5):
+    def play(self, play_episodes=5):
         """
         Play a few episodes with the currently trained policy.
         """
-        cmd = Command(dr=dr, dh=dh)
+        cmd = Command(dr=550, dh=550)
 
         for _ in range(play_episodes):
-            roll = self.rollout(episodes=1, sample_action=sample_action, 
-                                  cmd=cmd, render=True)
+            roll = self.rollout(episodes=1, sample_action=True, 
+                                  cmd=cmd, render=True, epsilon=0.0)
 
             print(f"Episode Reward: {roll.mean_reward} Steps: {roll.length}")
 
@@ -266,7 +266,7 @@ class CartPoleTrainable(Trainable):
                 self.model.train()
             
             if render:
-                env.render()
+                self.env.render()
                 time.sleep(0.01)
                 
             s_old = s        
@@ -361,3 +361,9 @@ class CartPoleTrainable(Trainable):
             'init_dr' : 0,
             'render' : False
         }
+
+if __name__ == '__main__':
+    t = CartPoleTrainable()
+    d = '/home/andriy/ray_results/CartPoleTrainable/CartPoleTrainable_86edf4bf_2020-02-02_13-41-50a8gnqyok/checkpoint_3333/checkpoint.pt'
+    t.restore(d)
+    t.play()
