@@ -1,3 +1,5 @@
+import ray
+from ray import tune
 from ray.tune import Trainable
 from lib import ReplayBuffer, Command, Trajectory, Rollout
 from model import Behavior
@@ -19,9 +21,8 @@ from itertools import count
 
 class LunarLanderTrainable(Trainable):
     def _setup(self, config={}):
-        self.config = self.default_config
-        self.config.update(config)
-
+        self.config = config
+        print(self.config)
         self.seed =  self.config['seed']
         if self.seed is not None:
             random.seed(self.seed)
@@ -312,50 +313,74 @@ class LunarLanderTrainable(Trainable):
                 checkpoint_path)
         return checkpoint_path
 
-    @property
-    def default_config(self):
-        # Environment to train on
-        return {
-            'seed' : None,
-            'env_name': 'LunarLander-v2',
-            'num_stack' : 4,
-            'hidden_size' : 32,
+def do_train():
+    ray.init(num_cpus=4)
+   
+    tune.run(
+        LunarLanderTrainable,
+        checkpoint_freq=5,
+        checkpoint_at_end=True,
+        config=CONFIG
+        # restore="/home/andriy/ray_results/LunarLanderTrainable/LunarLanderTrainable_fb8e1162_2020-02-04_00-41-25w06h0kfk/check_last/checkpoint.pt"
+    )
 
-            # Starting epsilon value for exploration
-            'epsilon' : 0.5,
-            # how fast to decay the epsilon to zero (X-value decays epsilon in approximately 10X steps. E.g. 100_000 decay reduces it to zero in 1_000_000 steps)            
-            'epsilon_decay' : 500_000,
+    # print("Best config is:", analysis.get_best_config(metric="Buffer_Rewards/mean_last_few"))
 
-            'return_scale': 0.01,
-            'horizon_scale' : 0.001,
-            'lr': 0.01,
-            'batch_size' : 512,
+def do_play(checkpoint):
+    t = LunarLanderTrainable(CONFIG)    
+    t.restore(checkpoint)
+    t.play()  
 
-            # Solved when min reward is at least this ...
-            'solved_min_reward' : 200,
-            # ... over this many episodes
-            'solved_n_episodes' :  100,
-            'max_steps' : 10**7,
+CONFIG = {
+    'seed' : None,
+    'env_name': 'LunarLander-v2',
+    'num_stack' : 4,
+    'hidden_size' : 128,
 
-            # Maximum size of the replay buffer in episodes
-            'replay_size' : 512,
-            'n_episodes_per_iter' : 8,
+    # Starting epsilon value for exploration
+    'epsilon' : 0.5,
+    # how fast to decay the epsilon to zero (X-value decays epsilon in approximately 10X steps. E.g. 100_000 decay reduces it to zero in 1_000_000 steps)            
+    'epsilon_decay' : 500_000,
 
-            # How many last episodes to use for selecting the desire/horizon from
-            'last_few' : 16,
+    'return_scale': 0.01,
+    'horizon_scale' : 0.001,
+    'lr': 0.001,
+    'batch_size' : 512,
 
-            # How many updates of the model to do by sampling from the replay buffer
-            'n_updates_per_iter' : 50,
-            'eval_episodes' : 5,
+    # Solved when min reward is at least this ...
+    'solved_min_reward' : 200,
+    # ... over this many episodes
+    'solved_n_episodes' :  100,
+    'max_steps' : 10**7,
 
-            # Initial dh, dr values to use when our buffer is empty
-            'init_dh' : 1,
-            'init_dr' : 0,
-            'render' : False
-        }
+    # Maximum size of the replay buffer in episodes
+    'replay_size' : 512,
+    'n_episodes_per_iter' : 8,
+
+    # How many last episodes to use for selecting the desire/horizon from
+    'last_few' : 16,
+
+    # How many updates of the model to do by sampling from the replay buffer
+    'n_updates_per_iter' : 50,
+    'eval_episodes' : 5,
+
+    # Initial dh, dr values to use when our buffer is empty
+    'init_dh' : 1,
+    'init_dr' : 0,
+    'render' : False
+}          
+    
+def main(play=False, train=False):
+    if play:
+        c = '/home/andriy/ray_results/LunarLanderTrainable/LunarLanderTrainable_1a2ab650_2020-02-04_02-43-58d8h7zglz/last/checkpoint.pt'
+        do_play(c)
+    elif train:
+        do_train()
+    else:
+        print("You must provide either 'train' or 'play' as command line argument. e.g. python blah.py train")
+
 
 if __name__ == '__main__':
-    t = LunarLanderTrainable()
-    d = '/home/andriy/ray_results/LunarLanderTrainable/LunarLanderTrainable_fb8e1162_2020-02-04_00-41-25w06h0kfk/check/checkpoint.pt'
-    t.restore(d)
-    t.play()        
+    import plac; plac.call(main)
+
+

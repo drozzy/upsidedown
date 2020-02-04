@@ -13,6 +13,7 @@ def main():
         LunarLanderTrainable,
         checkpoint_freq=5,
         checkpoint_at_end=True
+        # restore="/home/andriy/ray_results/LunarLanderTrainable/LunarLanderTrainable_fb8e1162_2020-02-04_00-41-25w06h0kfk/check_last/checkpoint.pt"
     )
 
     # print("Best config is:", analysis.get_best_config(metric="Buffer_Rewards/mean_last_few"))
