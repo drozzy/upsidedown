@@ -364,6 +364,6 @@ class CartPoleTrainable(Trainable):
 
 if __name__ == '__main__':
     t = CartPoleTrainable()
-    d = '/home/andriy/ray_results/CartPoleTrainable/CartPoleTrainable_86edf4bf_2020-02-02_13-41-50a8gnqyok/checkpoint_3333/checkpoint.pt'
+    d = '/home/andriy/ray_results/CartPoleTrainable/CartPoleTrainable_86edf4c0_2020-02-02_20-56-13lpgolfq2/checkpoint_813/checkpoint.pt'
     t.restore(d)
     t.play()

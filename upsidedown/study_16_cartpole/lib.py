@@ -42,7 +42,7 @@ class ReplayBuffer(object):
         self.max_size = state_dict['max_size']
         self.cur_size = state_dict['cur_size']
         self.buffer = state_dict['buffer']
-        self.sorter_buffer = sorted(state_dict['buffer'], key=lambda x: x.total_return, reverse=True)
+        self.sorted_buffer = sorted(state_dict['buffer'], key=lambda x: x.total_return, reverse=True)
         self.last_few = state_dict['last_few']
 
     def add(self, trajectories):
@@ -112,12 +112,6 @@ class ReplayBuffer(object):
 
         episodes = self.sorted_buffer[:self.last_few]
         
-        # This seems to work for cartpole:
-        # dh_0 = 2 * np.max([e.length for e in episodes])
-        # max_return = np.max([e.total_return for e in episodes])
-        # dr_0 = max(2 * max_return, 1)
-
-        # This seems to work for lunar-lander
         dh_0 = np.mean([e.length for e in episodes])
         m = np.mean([e.total_return for e in episodes])
         s = np.std([e.total_return for e in episodes])        

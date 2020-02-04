@@ -52,7 +52,8 @@ def main():
         checkpoint_freq=1,
         keep_checkpoints_num=3,
         checkpoint_score_attr='episode_reward_mean',
-        checkpoint_at_end=True #,
+        checkpoint_at_end=True,
+        restore="/home/andriy/ray_results/CartPoleTrainable/CartPoleTrainable_86edf4c0_2020-02-02_20-56-13lpgolfq2/checkpoint_813/checkpoint.pt"
         # scheduler=ASHAScheduler(
         #     time_attr='training_iteration',
         #     grace_period=20,
