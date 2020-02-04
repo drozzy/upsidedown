@@ -63,23 +63,19 @@ class LunarLanderTrainable(Trainable):
 
         self.model = Behavior(hidden_size=self.hidden_size, state_shape=self.env.observation_space.shape, num_actions=self.env.action_space.n,
             return_scale=self.return_scale, horizon_scale=self.horizon_scale).to(self.device)
-        # self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.9)
-        self.scheduler = torch.optim.lr_scheduler.CyclicLR(self.optimizer, base_lr=0.0001, max_lr=self.lr,
-            step_size_up=200)
+        self.optimizer = torch.optim.RMSprop(self.model.parameters(), lr=self.lr)
 
         self.rb = ReplayBuffer(max_size=self.replay_size, last_few=self.last_few)
     
-
-    def play(self, dr=300, dh=300, sample_action=True, play_episodes=5):
+    def play(self, play_episodes=5):
         """
         Play a few episodes with the currently trained policy.
         """
-        cmd = Command(dr=dr, dh=dh)
+        cmd = Command(dr=300, dh=300)
 
         for _ in range(play_episodes):
-            roll = self.rollout(episodes=1, sample_action=sample_action, 
-                                  cmd=cmd, render=True)
+            roll = self.rollout(episodes=1, sample_action=True, 
+                                  cmd=cmd, render=True, epsilon=0.0)
 
             print(f"Episode Reward: {roll.mean_reward} Steps: {roll.length}")
 
@@ -184,7 +180,6 @@ class LunarLanderTrainable(Trainable):
 
         avg_loss = loss_sum/loss_count
 
-        self.scheduler.step()
 
         return avg_loss
 
@@ -263,7 +258,7 @@ class LunarLanderTrainable(Trainable):
                 self.model.train()
             
             if render:
-                env.render()
+                self.env.render()
                 time.sleep(0.01)
                 
             s_old = s        
@@ -327,13 +322,13 @@ class LunarLanderTrainable(Trainable):
             'hidden_size' : 32,
 
             # Starting epsilon value for exploration
-            'epsilon' : 0.99,
+            'epsilon' : 0.5,
             # how fast to decay the epsilon to zero (X-value decays epsilon in approximately 10X steps. E.g. 100_000 decay reduces it to zero in 1_000_000 steps)            
-            'epsilon_decay' : 100_000,
+            'epsilon_decay' : 500_000,
 
             'return_scale': 0.01,
             'horizon_scale' : 0.001,
-            'lr': 0.1,            
+            'lr': 0.01,
             'batch_size' : 512,
 
             # Solved when min reward is at least this ...
@@ -358,3 +353,9 @@ class LunarLanderTrainable(Trainable):
             'init_dr' : 0,
             'render' : False
         }
+
+if __name__ == '__main__':
+    t = LunarLanderTrainable()
+    d = '/home/andriy/ray_results/LunarLanderTrainable/LunarLanderTrainable_fb8e1162_2020-02-04_00-41-25w06h0kfk/check/checkpoint.pt'
+    t.restore(d)
+    t.play()        
