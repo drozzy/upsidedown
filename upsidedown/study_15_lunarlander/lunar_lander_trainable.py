@@ -375,7 +375,7 @@ def main(train=False):
         print("Playing...")
         c = '/home/andriy/ray_results/LunarLanderTrainable/LunarLanderTrainable_1a2ab650_2020-02-04_02-43-58d8h7zglz/last/checkpoint.pt'
         do_play(c)
-    else train:
+    else:
         print("Training...")
         do_train()
 
