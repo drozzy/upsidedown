@@ -338,13 +338,13 @@ CONFIG = {
     'hidden_size' : 128,
 
     # Starting epsilon value for exploration
-    'epsilon' : 0.5,
+    'epsilon' : 0.1,
     # how fast to decay the epsilon to zero (X-value decays epsilon in approximately 10X steps. E.g. 100_000 decay reduces it to zero in 1_000_000 steps)            
-    'epsilon_decay' : 500_000,
+    'epsilon_decay' : 100_000,
 
     'return_scale': 0.01,
     'horizon_scale' : 0.001,
-    'lr': 0.001,
+    'lr': 0.0001,
     'batch_size' : 512,
 
     # Solved when min reward is at least this ...
@@ -358,10 +358,10 @@ CONFIG = {
     'n_episodes_per_iter' : 8,
 
     # How many last episodes to use for selecting the desire/horizon from
-    'last_few' : 16,
+    'last_few' : 32,
 
     # How many updates of the model to do by sampling from the replay buffer
-    'n_updates_per_iter' : 50,
+    'n_updates_per_iter' : 500,
     'eval_episodes' : 5,
 
     # Initial dh, dr values to use when our buffer is empty
@@ -370,14 +370,14 @@ CONFIG = {
     'render' : False
 }          
     
-def main(play=False, train=False):
-    if play:
+def main(train=False):
+    if not train:
+        print("Playing...")
         c = '/home/andriy/ray_results/LunarLanderTrainable/LunarLanderTrainable_1a2ab650_2020-02-04_02-43-58d8h7zglz/last/checkpoint.pt'
         do_play(c)
-    elif train:
+    else train:
+        print("Training...")
         do_train()
-    else:
-        print("You must provide either 'train' or 'play' as command line argument. e.g. python blah.py train")
 
 
 if __name__ == '__main__':
