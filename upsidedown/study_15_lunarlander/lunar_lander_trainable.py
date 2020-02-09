@@ -218,7 +218,7 @@ class LunarLanderTrainable(Trainable):
         loss.backward()
         self.optimizer.step()
         
-        return loss.detach().numpy()
+        return loss.detach().cpu().numpy()
 
     def rollout(self, episodes, epsilon, sample_action=True, cmd=None, render=False):
         assert cmd is not None
@@ -320,7 +320,8 @@ def do_train():
         LunarLanderTrainable,
         checkpoint_freq=5,
         checkpoint_at_end=True,
-        config=CONFIG
+        config=CONFIG,
+        resources_per_trial={"gpu":1} # <- need this to enable gpu
         # restore="/home/andriy/ray_results/LunarLanderTrainable/LunarLanderTrainable_fb8e1162_2020-02-04_00-41-25w06h0kfk/check_last/checkpoint.pt"
     )
 
