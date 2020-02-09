@@ -52,7 +52,7 @@ class LunarLanderTrainable(Trainable):
         self.epsilon_decay = self.config['epsilon_decay']
 
         # Initialize 
-        self.device = torch.device("cpu")
+        self.device = torch.device("cuda")
         self.steps = 0
         self.loss = None
         self.rewards = []
@@ -345,7 +345,7 @@ CONFIG = {
     'return_scale': 0.01,
     'horizon_scale' : 0.001,
     'lr': 0.0001,
-    'batch_size' : 512,
+    'batch_size' : 1024,
 
     # Solved when min reward is at least this ...
     'solved_min_reward' : 200,
@@ -355,7 +355,7 @@ CONFIG = {
 
     # Maximum size of the replay buffer in episodes
     'replay_size' : 512,
-    'n_episodes_per_iter' : 8,
+    'n_episodes_per_iter' : 1,
 
     # How many last episodes to use for selecting the desire/horizon from
     'last_few' : 32,
