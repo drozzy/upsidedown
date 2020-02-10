@@ -336,7 +336,7 @@ CONFIG = {
     'seed' : None,
     'env_name': 'LunarLander-v2',
     'num_stack' : 4,
-    'hidden_size' : 128,
+    'hidden_size' : 512,
 
     # Starting epsilon value for exploration
     'epsilon' : 0.1,
@@ -345,8 +345,8 @@ CONFIG = {
 
     'return_scale': 0.01,
     'horizon_scale' : 0.001,
-    'lr': 0.0001,
-    'batch_size' : 1024,
+    'lr': 0.0005,
+    'batch_size' : 2048,
 
     # Solved when min reward is at least this ...
     'solved_min_reward' : 200,
@@ -362,7 +362,7 @@ CONFIG = {
     'last_few' : 32,
 
     # How many updates of the model to do by sampling from the replay buffer
-    'n_updates_per_iter' : 500,
+    'n_updates_per_iter' : 1000,
     'eval_episodes' : 5,
 
     # Initial dh, dr values to use when our buffer is empty
