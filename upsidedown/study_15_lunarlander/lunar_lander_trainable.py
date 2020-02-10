@@ -362,7 +362,7 @@ CONFIG = {
     'last_few' : 32,
 
     # How many updates of the model to do by sampling from the replay buffer
-    'n_updates_per_iter' : 1000,
+    'n_updates_per_iter' : 256,
     'eval_episodes' : 5,
 
     # Initial dh, dr values to use when our buffer is empty
