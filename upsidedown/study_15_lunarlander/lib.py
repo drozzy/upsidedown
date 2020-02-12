@@ -55,8 +55,9 @@ class ReplayBuffer(object):
             
     def _add(self, trajectory):
         self.buffer.append(trajectory)
-        self.sorted_buffer = sorted(self.buffer, key=lambda x: x.total_return, reverse=True)
         self.buffer = self.buffer[-self.max_size:]
+
+        self.sorted_buffer = sorted(self.buffer, key=lambda x: x.total_return, reverse=True)
         self.sorted_buffer = self.sorted_buffer[:self.max_size]
 
     def stats(self):
