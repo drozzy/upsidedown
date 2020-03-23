@@ -1,5 +1,10 @@
 # upsidedown
 
+
+## Effectiveness
+
+The CartPole should work but the LunarLander never learns completely.
+
 ## Setup
 
 Create new environment:
