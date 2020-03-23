@@ -1,5 +1,6 @@
 # upsidedown
 
+Implementation of the Upside Down Reinforcement Learning (UDRL) based on the papers https://arxiv.org/abs/1912.02875 and https://arxiv.org/abs/1912.02877.
 
 ## Effectiveness
 
